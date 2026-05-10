@@ -200,24 +200,15 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-<!-- Google APIs — loaded after page render -->
-<script>
-  function loadGoogleAPIs() {
-    var gapiScript = document.createElement('script');
-    gapiScript.src = 'https://apis.google.com/js/api.js';
-    gapiScript.onload = function() { window.AppAuth.gapiLoaded(); };
-    document.body.appendChild(gapiScript);
+<!-- Google APIs -->
+<script src="https://apis.google.com/js/api.js" onload="window.AppAuth.gapiLoaded()" defer></script>
+<script src="https://accounts.google.com/gsi/client" onload="window.AppAuth.gisLoaded()" defer></script>
 
-    var gisScript = document.createElement('script');
-    gisScript.src = 'https://accounts.google.com/gsi/client';
-    gisScript.onload = function() { window.AppAuth.gisLoaded(); };
-    document.body.appendChild(gisScript);
-  }
-  if (document.readyState === 'complete') {
-    loadGoogleAPIs();
-  } else {
-    window.addEventListener('load', loadGoogleAPIs);
-  }
+<!-- Signal page is ready for browser extension -->
+<script>
+  window.addEventListener('load', function() {
+    document.documentElement.setAttribute('data-ready', 'true');
+  });
 </script>
 
 <!-- Service Worker registration -->
