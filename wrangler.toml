@@ -1,0 +1,8 @@
+name = "mizaniya"
+main = "worker.js"
+compatibility_date = "2026-05-10"
+workers_dev = true
+preview_urls = true
+
+[assets]
+directory = "."
