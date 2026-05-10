@@ -677,3 +677,52 @@ body {
   vertical-align: 1px;
   flex-shrink: 0;
 }
+
+/* ── Fixed costs card — v2.2.0 ───────────────────────────────────────────── */
+.fixed-costs-card {
+  margin: 1rem 1.25rem 0;
+  background: var(--bg2);
+  border: 1px solid rgba(200,169,110,.2);
+  border-radius: var(--r);
+  padding: 1rem;
+}
+
+.fixed-note {
+  font-size: 0.68rem;
+  color: var(--accent);
+  opacity: .75;
+  margin-left: 8px;
+}
+
+.fixed-total {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.fixed-group {
+  margin-top: .5rem;
+  border-top: 1px solid var(--border);
+  padding-top: .5rem;
+}
+
+.fixed-group-label {
+  font-size: 0.68rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text3);
+  margin-bottom: 4px;
+}
+
+.fixed-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 0.82rem;
+}
+
+.fixed-name { color: var(--text2); }
+.fixed-amt  { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text); }
