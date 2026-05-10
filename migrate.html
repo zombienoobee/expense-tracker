@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mizaniya — Data Migration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#242424;
+      --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+      --text:#f0ece4;--text2:#9a9690;--text3:#5a5754;
+      --accent:#c8a96e;--success:#4a7c59;--success-text:#8fbf8a;
+      --danger:#d46b6b;--info:#6b9fd4;
+      --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+      --r:10px;--r-sm:6px;
+    }
+    html{font-size:15px;}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+    .wrap{max-width:560px;margin:0 auto;padding:2rem 1.25rem 4rem;}
+    .logo{font-size:1.1rem;font-weight:600;letter-spacing:-.03em;color:var(--text);margin-bottom:.25rem;}
+    .logo span{color:var(--accent);}
+    .page-title{font-size:1.5rem;font-weight:600;letter-spacing:-.04em;margin-bottom:.5rem;}
+    .page-sub{font-size:.875rem;color:var(--text2);line-height:1.6;margin-bottom:1.5rem;}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem;}
+    .card-title{font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:.75rem;}
+    .step{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);font-size:.875rem;color:var(--text2);}
+    .step:last-child{border-bottom:none;}
+    .step-num{width:22px;height:22px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:500;color:var(--text3);flex-shrink:0;margin-top:1px;}
+    .step-num.done{background:var(--success);border-color:transparent;color:var(--success-text);}
+    .step-num.active{background:rgba(200,169,110,.15);border-color:rgba(200,169,110,.3);color:var(--accent);}
+    .step-num.error{background:rgba(212,107,107,.15);border-color:rgba(212,107,107,.3);color:var(--danger);}
+    .step-text{flex:1;line-height:1.5;}
+    .step-text strong{color:var(--text);font-weight:500;}
+    .log-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:.875rem;font-family:var(--mono);font-size:.75rem;color:var(--text2);line-height:1.7;min-height:80px;max-height:240px;overflow-y:auto;margin-top:.75rem;}
+    .log-line{display:block;}
+    .log-ok{color:var(--success-text);}
+    .log-info{color:var(--info);}
+    .log-warn{color:var(--accent);}
+    .log-err{color:var(--danger);}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;border-radius:var(--r-sm);font-size:.9rem;font-weight:500;font-family:var(--font);cursor:pointer;border:none;transition:opacity .15s;}
+    .btn-primary{background:var(--accent);color:#1a1000;}
+    .btn-primary:hover{opacity:.85;}
+    .btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+    .btn-success{background:var(--success);color:var(--success-text);}
+    .btn-row{display:flex;gap:10px;margin-top:1.25rem;flex-wrap:wrap;}
+    .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:.75rem;}
+    .sum-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;text-align:center;}
+    .sum-val{font-family:var(--mono);font-size:1.1rem;font-weight:500;color:var(--accent);}
+    .sum-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-top:2px;}
+    .warn-box{background:rgba(200,169,110,.07);border:1px solid rgba(200,169,110,.2);border-radius:var(--r-sm);padding:.875rem 1rem;font-size:.8rem;color:var(--accent);line-height:1.6;margin-bottom:1rem;}
+    .done-box{background:rgba(74,124,89,.1);border:1px solid rgba(74,124,89,.25);border-radius:var(--r);padding:1.25rem;text-align:center;display:none;}
+    .done-title{font-size:1.1rem;font-weight:600;color:var(--success-text);margin-bottom:.5rem;}
+    .done-sub{font-size:.875rem;color:var(--text2);}
+    .done-link{display:inline-block;margin-top:1rem;padding:10px 20px;background:var(--accent);color:#1a1000;border-radius:var(--r-sm);font-weight:500;font-size:.9rem;text-decoration:none;}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">Mizaniya<span>.</span></div>
+  <p style="font-size:.75rem;color:var(--text3);margin-bottom:1.5rem;">One-time data migration tool</p>
+
+  <div class="warn-box">
+    ⚠ Run this tool once only. It will read your existing Google Drive data, remap all categories to the new 11-category schema, and write it back. Your data is safe — a backup is logged before any changes are made.
+  </div>
+
+  <div class="card">
+    <div class="card-title">Migration steps</div>
+    <div class="step"><div class="step-num" id="s1">1</div><div class="step-text"><strong>Sign in</strong> — authenticate with Google Drive</div></div>
+    <div class="step"><div class="step-num" id="s2">2</div><div class="step-text"><strong>Read</strong> — load current expenses from Drive</div></div>
+    <div class="step"><div class="step-num" id="s3">3</div><div class="step-text"><strong>Remap</strong> — convert old categories to new schema</div></div>
+    <div class="step"><div class="step-num" id="s4">4</div><div class="step-text"><strong>Write</strong> — save migrated data back to Drive</div></div>
+    <div class="step"><div class="step-num" id="s5">5</div><div class="step-text"><strong>Update recurring</strong> — replace recurring.json with corrected items</div></div>
+  </div>
+
+  <div class="card" id="summary-card" style="display:none;">
+    <div class="card-title">Migration summary</div>
+    <div class="summary-grid">
+      <div class="sum-card"><div class="sum-val" id="sum-total">0</div><div class="sum-lbl">Entries</div></div>
+      <div class="sum-card"><div class="sum-val" id="sum-remapped">0</div><div class="sum-lbl">Remapped</div></div>
+      <div class="sum-card"><div class="sum-val" id="sum-unchanged">0</div><div class="sum-lbl">Unchanged</div></div>
+    </div>
+    <div class="log-box" id="log-box"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btn-start" onclick="startMigration()">Start migration</button>
+  </div>
+
+  <div class="done-box" id="done-box">
+    <div class="done-title">✓ Migration complete</div>
+    <div class="done-sub">All entries remapped to the new 11-category schema. You can now close this tab and use Mizaniya normally.</div>
+    <a class="done-link" href="/expense-tracker/">Open Mizaniya →</a>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script>
+
+// ── Category remap — old name → new name ──────────────────────────────────────
+const CAT_REMAP = {
+  // Old → New
+  'groceries_food': 'groceries',
+  'subscriptions':  'streaming',    // broad subscriptions → streaming (will be refined per item)
+  'home_personal':  'shopping',
+  'health_copay':   'health_copay', // unchanged
+  'utilities_tech': 'utilities_tech', // unchanged
+  'charity_giving': 'charity_giving', // unchanged
+  'housing':        'housing',      // unchanged
+  'auto_transport': 'auto_transport', // unchanged
+};
+
+// Item-level overrides — some items in old subscriptions go to memberships not streaming
+const ITEM_CAT_OVERRIDE = {
+  'Costco':           'memberships',
+  'Costco Membership':'memberships',
+  'Amazon':           'groceries',
+  'Amazon Prime':     'memberships',
+  'Walmart+':         'memberships',
+  'Walmart':          'groceries',
+  'Playstation+':     'memberships',
+  'Frontier':         'memberships',
+  'Frontier WildPass':'memberships',
+  'Frontier Discount Den':'memberships',
+  'EBRPD':            'memberships',
+  'CDFW':             'memberships',
+  'ATT':              'utilities_tech',
+  'Spotify':          'streaming',
+  'Netflix':          'streaming',
+  'HBO Max':          'streaming',
+  'MGM+':             'streaming',
+  'QTV+':             'streaming',
+  'STARZ':            'streaming',
+  'YouTube':          'streaming',
+  'WSJ+':             'utilities_tech',
+  'ChatGPT':          'utilities_tech',
+  'ClaudeGPT':        'utilities_tech',
+  'iCloud+':          'utilities_tech',
+  'Norton':           'utilities_tech',
+  'TurboTax':         'utilities_tech',
+  'Internet':         'utilities_tech',
+  'AllState':         'insurance',
+  'AllState Car':     'insurance',
+  'Renter Insurance': 'insurance',
+  'AAA':              'insurance',
+  'Kaiser':           'health_copay',
+  'mfsusa':           'health_copay',
+  'Fitness+':         'health_copay',
+  'Sadaqa':           'charity_giving',
+  'Zakat':            'charity_giving',
+  'Fitra':            'charity_giving',
+  'Qurbani':          'charity_giving',
+  'Gas':              'auto_transport',
+  'Car Registration': 'auto_transport',
+  'Oil Change':       'auto_transport',
+  'Car Wash':         'auto_transport',
+  'SMOG':             'auto_transport',
+  'Uber':             'auto_transport',
+  'Temu':             'shopping',
+  'Home Depot':       'shopping',
+  'MajicJack':        'shopping',
+  'Apple Pay':        'shopping',
+  'Desi Store':       'groceries',
+  'Venison':          'groceries',
+  'Beef':             'groceries',
+  'Qeema':            'groceries',
+  'Chicken':          'groceries',
+  'Fish':             'groceries',
+  'Rent':             'housing',
+  'PGE':              'housing',
+  'Water':            'housing',
+  'Sewerage':         'housing',
+  'Garbage':          'housing',
+  'Service Fee':      'housing',
+  'Laundry':          'housing',
+  'CITI':             'credit_cards',
+  'BOA':              'credit_cards',
+  'CHASE':            'credit_cards',
+  'Zoya':             null, // remove
+};
+
+const CLIENT_ID   = null; // auto-loaded from auth.js config — reads from existing setup
+const SCOPES      = 'https://www.googleapis.com/auth/drive.appdata';
+const DISCOVERY   = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
+const FILE_NAMES  = { expenses:'expenses.json', recurring:'recurring.json', meta:'meta.json' };
+
+let tokenClient = null;
+let _token      = null;
+
+function log(msg, type='info') {
+  const box  = document.getElementById('log-box');
+  const line = document.createElement('span');
+  line.className = 'log-line log-'+type;
+  line.textContent = '['+new Date().toLocaleTimeString()+'] '+msg;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+  document.getElementById('summary-card').style.display = 'block';
+}
+
+function setStep(n, state) {
+  const el = document.getElementById('s'+n);
+  el.className = 'step-num '+state;
+  if (state==='done') el.textContent = '✓';
+  else if (state==='error') el.textContent = '✗';
+  else el.textContent = n;
+}
+
+async function findFile(name) {
+  const res = await gapi.client.drive.files.list({
+    spaces:'appDataFolder', fields:'files(id,name)', q:`name='${name}'`
+  });
+  const files = res.result.files;
+  return files && files.length > 0 ? files[0].id : null;
+}
+
+async function readFile(name) {
+  const fileId = await findFile(name);
+  if (!fileId) return null;
+  const res = await gapi.client.drive.files.get({ fileId, alt:'media' });
+  return typeof res.result === 'string' ? JSON.parse(res.result) : res.result;
+}
+
+async function writeFile(name, data) {
+  const body = JSON.stringify(data, null, 2);
+  const blob = new Blob([body], { type:'application/json' });
+  const existingId = await findFile(name);
+  const metadata = { name, parents: existingId ? undefined : ['appDataFolder'] };
+  const form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify(metadata)], { type:'application/json' }));
+  form.append('file', blob);
+  const token = gapi.client.getToken().access_token;
+  const url = existingId
+    ? `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart`
+    : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+  await fetch(url, { method: existingId?'PATCH':'POST', headers:{ Authorization:`Bearer ${token}` }, body:form });
+}
+
+async function startMigration() {
+  document.getElementById('btn-start').disabled = true;
+
+  // ── Step 1: Sign in ───────────────────────────────────────────────────────
+  setStep(1,'active');
+  log('Initialising Google API...','info');
+  await new Promise(resolve => gapi.load('client', resolve));
+  await gapi.client.init({ discoveryDocs:[DISCOVERY] });
+
+  // Read CLIENT_ID from auth.js AppAuth config
+  const authScript = document.querySelector('script[src="js/auth.js"]');
+  // Inline token client using same client ID as auth.js
+  await new Promise((resolve, reject) => {
+    // We need to get the client id — read it from auth.js source
+    fetch('js/auth.js').then(r=>r.text()).then(src => {
+      const match = src.match(/CLIENT_ID:\s*'([^']+)'/);
+      if (!match) { reject(new Error('CLIENT_ID not found in auth.js')); return; }
+      const clientId = match[1];
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: SCOPES,
+        callback: (resp) => {
+          if (resp.error) { reject(new Error(resp.error)); return; }
+          resolve();
+        }
+      });
+      tokenClient.requestAccessToken({ prompt:'consent' });
+    });
+  });
+  setStep(1,'done');
+  log('Signed in successfully','ok');
+
+  // ── Step 2: Read ──────────────────────────────────────────────────────────
+  setStep(2,'active');
+  log('Reading expenses.json from Drive...','info');
+  const entries = await readFile(FILE_NAMES.expenses);
+  if (!entries) { setStep(2,'error'); log('No expenses.json found — nothing to migrate','warn'); return; }
+  log(`Found ${entries.length} entries in Drive`,'ok');
+  setStep(2,'done');
+
+  // ── Step 3: Remap ─────────────────────────────────────────────────────────
+  setStep(3,'active');
+  let remapped = 0, unchanged = 0, removed = 0;
+  const migrated = [];
+
+  entries.forEach(entry => {
+    // Check item-level override first
+    const itemOverride = ITEM_CAT_OVERRIDE[entry.name];
+    if (itemOverride === null) {
+      log(`Removing: ${entry.name}`,'warn');
+      removed++;
+      return; // skip — item removed (Zoya)
+    }
+
+    const oldCat = entry.category;
+    let newCat;
+
+    if (itemOverride) {
+      newCat = itemOverride;
+    } else if (CAT_REMAP[oldCat]) {
+      newCat = CAT_REMAP[oldCat];
+    } else {
+      newCat = oldCat; // already correct
+    }
+
+    if (newCat !== oldCat) {
+      log(`${entry.name}: ${oldCat} → ${newCat}`,'info');
+      remapped++;
+    } else {
+      unchanged++;
+    }
+
+    migrated.push({ ...entry, category: newCat });
+  });
+
+  document.getElementById('sum-total').textContent     = entries.length;
+  document.getElementById('sum-remapped').textContent  = remapped;
+  document.getElementById('sum-unchanged').textContent = unchanged;
+  log(`Remapped: ${remapped}, Unchanged: ${unchanged}, Removed: ${removed}`,'ok');
+  setStep(3,'done');
+
+  // ── Step 4: Write expenses ────────────────────────────────────────────────
+  setStep(4,'active');
+  log('Writing migrated expenses to Drive...','info');
+  await writeFile(FILE_NAMES.expenses, migrated);
+  log('expenses.json updated successfully','ok');
+  setStep(4,'done');
+
+  // ── Step 5: Update recurring ──────────────────────────────────────────────
+  setStep(5,'active');
+  log('Writing updated recurring.json to Drive...','info');
+  const newRecurring = window.buildRecurring();
+  await writeFile(FILE_NAMES.recurring, newRecurring);
+  log(`recurring.json updated — ${newRecurring.length} items written`,'ok');
+
+  // Update meta version
+  const meta = await readFile(FILE_NAMES.meta) || {};
+  await writeFile(FILE_NAMES.meta, { ...meta, version:'2.1.0', last_sync: new Date().toISOString(), migrated_at: new Date().toISOString() });
+  log('meta.json version updated to 2.1.0','ok');
+  setStep(5,'done');
+
+  log('━━━ Migration complete ━━━','ok');
+  document.getElementById('done-box').style.display = 'block';
+  document.getElementById('btn-start').style.display = 'none';
+}
+</script>
+
+<script src="js/auth.js"></script>
+<script async defer src="https://apis.google.com/js/api.js"></script>
+<script async defer src="https://accounts.google.com/gsi/client"></script>
+</body>
+</html>
