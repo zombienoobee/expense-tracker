@@ -559,3 +559,121 @@ body {
   cursor: pointer;
 }
 .settings-btn-danger:hover { opacity: .8; }
+
+/* ── Sprint 2 — Charts & 5-tab nav ──────────────────────────────────────── */
+
+/* Chart sections */
+.chart-section {
+  margin: 1rem 1.25rem 0;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 1rem;
+}
+
+.chart-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: .875rem;
+}
+
+.chart-title {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text2);
+}
+
+.chart-sub {
+  font-size: 0.72rem;
+  color: var(--text3);
+}
+
+.donut-wrap {
+  position: relative;
+  height: 200px;
+  margin-bottom: .875rem;
+}
+
+.bar-wrap {
+  position: relative;
+  height: 180px;
+}
+
+/* Donut legend */
+.legend-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: .5rem;
+  border-top: 1px solid var(--border);
+  padding-top: .75rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  flex: 1;
+  color: var(--text2);
+}
+
+.legend-val {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text);
+}
+
+/* View tab label */
+.view-tab-label {
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text3);
+  padding: .875rem 1.25rem .25rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 5-tab nav — tighter */
+.bottom-nav {
+  justify-content: space-around;
+  padding: .375rem 0 calc(.375rem + env(safe-area-inset-bottom));
+}
+
+.nav-btn {
+  padding: 4px 8px;
+  min-width: 0;
+}
+
+.nav-btn span {
+  font-size: 0.6rem;
+}
+
+.nav-btn i {
+  font-size: 1.1rem;
+}
+
+/* Category dot in list header */
+.cat-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: 1px;
+  flex-shrink: 0;
+}
