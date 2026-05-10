@@ -7,7 +7,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0f0f0f">
   <title>Mizaniya</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -199,9 +198,27 @@
 <script src="js/drive.js"></script>
 <script src="js/ui.js"></script>
 
-<!-- Google APIs -->
-<script async defer src="https://apis.google.com/js/api.js" onload="window.AppAuth.gapiLoaded()"></script>
-<script async defer src="https://accounts.google.com/gsi/client" onload="window.AppAuth.gisLoaded()"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- Google APIs — loaded after page render -->
+<script>
+  function loadGoogleAPIs() {
+    var gapiScript = document.createElement('script');
+    gapiScript.src = 'https://apis.google.com/js/api.js';
+    gapiScript.onload = function() { window.AppAuth.gapiLoaded(); };
+    document.body.appendChild(gapiScript);
+
+    var gisScript = document.createElement('script');
+    gisScript.src = 'https://accounts.google.com/gsi/client';
+    gisScript.onload = function() { window.AppAuth.gisLoaded(); };
+    document.body.appendChild(gisScript);
+  }
+  if (document.readyState === 'complete') {
+    loadGoogleAPIs();
+  } else {
+    window.addEventListener('load', loadGoogleAPIs);
+  }
+</script>
 
 <!-- Service Worker registration -->
 <script>
