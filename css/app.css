@@ -473,3 +473,29 @@ body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ── Status pill additions — v1.2.0 ─────────────────────────────────────── */
+.status-scheduled { background: rgba(107,159,212,.15); color: #6b9fd4; border-color: rgba(107,159,212,.25); }
+.status-na        { background: rgba(90,87,84,.15);    color: #5a5754; border-color: rgba(90,87,84,.2);     }
+
+/* ── Status select in edit modal ────────────────────────────────────────── */
+.status-select {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-sm);
+  padding: 9px 12px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239a9690' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: border-color .15s;
+}
+.status-select:focus { border-color: var(--accent); }
+.status-select option { background: #1a1a1a; color: var(--text); }
