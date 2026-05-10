@@ -1,8 +1,10 @@
-// ─── UI Controller — v1.3.0 ───────────────────────────────────────────────────
-// Fixes: show all entries, working nav, settings/version screen
+// ─── UI Controller — v2.0.0 ───────────────────────────────────────────────────
+// Sprint 2: Dashboard with charts, Entries tab, 5-tab nav
 
-const MONTHS = ['January','February','March','April','May','June',
-                'July','August','September','October','November','December'];
+const MONTHS     = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun',
+                      'Jul','Aug','Sep','Oct','Nov','Dec'];
 
 const STATUSES = {
   paid:      { label: 'Paid',      class: 'status-paid',      next: 'scheduled' },
@@ -12,16 +14,28 @@ const STATUSES = {
   na:        { label: 'N/A',       class: 'status-na',        next: 'paid'      },
 };
 
-const APP_VERSION = 'v1.3.0';
-const APP_DATE    = '2026-05-09';
+const CAT_COLORS = {
+  groceries_food: '#c8a96e',
+  subscriptions:  '#6b9fd4',
+  auto_transport: '#8fbf8a',
+  health_copay:   '#d46b6b',
+  utilities_tech: '#9b8fd4',
+  charity_giving: '#d4a46b',
+  housing:        '#6bbfd4',
+  home_personal:  '#d46b9b',
+};
+
+const APP_VERSION = 'v2.0.0';
+const APP_DATE    = '2026-05-10';
 
 let _state = {
   view:         'dashboard',
   year:         2026,
   month:        new Date().getMonth(),
   filterModule: 'all',
-  filterCat:    'all',
 };
+
+let _charts = { donut: null, bar: null };
 
 // ── Show/hide screens ─────────────────────────────────────────────────────────
 function showSignIn() {
@@ -38,89 +52,242 @@ function showApp() {
 // ── Master render ─────────────────────────────────────────────────────────────
 function renderAll() {
   renderSummaryCards();
-  renderExpenseList();
-  renderRenewalAlerts();
   renderNav();
-  renderView();
+  renderCurrentView();
 }
 
-// ── Summary cards ─────────────────────────────────────────────────────────────
+// ── Summary cards (always visible) ───────────────────────────────────────────
 function renderSummaryCards() {
   const entries  = window.AppDrive.getExpenses();
   const monthStr = `${_state.year}-${String(_state.month + 1).padStart(2,'0')}`;
   const active   = entries.filter(e =>
-    e.date === monthStr &&
-    e.amount !== null &&
-    e.status !== 'na' &&
-    e.status !== 'cancelled'
+    e.date === monthStr && e.amount && e.status !== 'na' && e.status !== 'cancelled'
   );
-  const personal  = active.filter(e => e.module === 'personal' ).reduce((s,e) => s + (e.amount||0), 0);
-  const household = active.filter(e => e.module === 'household').reduce((s,e) => s + (e.amount||0), 0);
-  const total     = personal + household;
-
+  const personal  = active.filter(e => e.module === 'personal' ).reduce((s,e) => s+(e.amount||0), 0);
+  const household = active.filter(e => e.module === 'household').reduce((s,e) => s+(e.amount||0), 0);
   const ytd = entries.filter(e => {
     const [y,m] = e.date.split('-').map(Number);
-    return y === _state.year && m <= (_state.month + 1) &&
-           e.amount !== null && e.status !== 'na' && e.status !== 'cancelled';
-  }).reduce((s,e) => s + (e.amount||0), 0);
+    return y === _state.year && m <= (_state.month+1) && e.amount && e.status !== 'na' && e.status !== 'cancelled';
+  }).reduce((s,e) => s+(e.amount||0), 0);
 
-  const fmt = n => '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const fmt = n => '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   document.getElementById('card-personal').textContent  = fmt(personal);
   document.getElementById('card-household').textContent = fmt(household);
-  document.getElementById('card-total').textContent     = fmt(total);
+  document.getElementById('card-total').textContent     = fmt(personal+household);
   document.getElementById('card-ytd').textContent       = fmt(ytd);
-  document.getElementById('month-label').textContent    = MONTHS[_state.month] + ' ' + _state.year;
+  document.getElementById('month-label').textContent    = MONTHS[_state.month]+' '+_state.year;
 }
 
-// ── Expense list ──────────────────────────────────────────────────────────────
-function renderExpenseList() {
-  const entries  = window.AppDrive.getExpenses();
-  const monthStr = `${_state.year}-${String(_state.month + 1).padStart(2,'0')}`;
+// ── Route to current view ─────────────────────────────────────────────────────
+function renderCurrentView() {
+  const views = ['view-dashboard','view-entries','view-personal','view-household','view-settings'];
+  views.forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+  const el = document.getElementById('view-'+_state.view);
+  if (el) el.style.display = 'block';
 
-  // Apply view filter
-  let viewModule = 'all';
-  if (_state.view === 'personal')  viewModule = 'personal';
-  if (_state.view === 'household') viewModule = 'household';
+  switch(_state.view) {
+    case 'dashboard':  renderDashboard();  break;
+    case 'entries':    renderEntries('all');      break;
+    case 'personal':   renderEntries('personal'); break;
+    case 'household':  renderEntries('household'); break;
+    case 'settings':   renderSettings();  break;
+  }
+}
 
-  let filtered = entries.filter(e => e.date === monthStr);
-  if (viewModule !== 'all')           filtered = filtered.filter(e => e.module === viewModule);
-  if (_state.filterModule !== 'all')  filtered = filtered.filter(e => e.module === _state.filterModule);
+// ── Dashboard — charts ────────────────────────────────────────────────────────
+function renderDashboard() {
+  const entries = window.AppDrive.getExpenses();
+  renderDonutChart(entries);
+  renderBarChart(entries);
+}
 
-  // Show ALL entries — only hide if amount is 0 AND status is pending (truly empty, not entered yet)
-  // Always show: paid, scheduled, cancelled, na, entries with notes, entries with amounts
-  filtered = filtered.filter(e =>
-    e.amount > 0 ||
-    e.status === 'paid'      ||
-    e.status === 'scheduled' ||
-    e.status === 'cancelled' ||
-    e.status === 'na'        ||
-    e.notes
+function renderDonutChart(entries) {
+  const monthStr = `${_state.year}-${String(_state.month+1).padStart(2,'0')}`;
+  const active   = entries.filter(e =>
+    e.date === monthStr && e.amount > 0 && e.status !== 'na' && e.status !== 'cancelled'
   );
 
-  const list = document.getElementById('expense-list');
+  // Aggregate by category
+  const catTotals = {};
+  active.forEach(e => {
+    catTotals[e.category] = (catTotals[e.category]||0) + (e.amount||0);
+  });
+
+  const cats   = Object.keys(catTotals).filter(k => catTotals[k] > 0);
+  const values = cats.map(k => catTotals[k]);
+  const colors = cats.map(k => CAT_COLORS[k] || '#888');
+  const labels = cats.map(k => (window.CATEGORIES[k]||{label:k}).label);
+  const total  = values.reduce((s,v) => s+v, 0);
+
+  const canvas = document.getElementById('chart-donut');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  if (_charts.donut) { _charts.donut.destroy(); _charts.donut = null; }
+
+  _charts.donut = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderColor: '#0f0f0f', borderWidth: 3, hoverOffset: 6 }] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: $${ctx.raw.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})} (${((ctx.raw/total)*100).toFixed(1)}%)`
+          },
+          backgroundColor: '#1a1a1a',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          titleColor: '#f0ece4',
+          bodyColor: '#9a9690',
+          padding: 10,
+        }
+      }
+    }
+  });
+
+  // Render legend
+  const legend = document.getElementById('donut-legend');
+  if (!legend) return;
+  legend.innerHTML = cats.map((k,i) => `
+    <div class="legend-item">
+      <span class="legend-dot" style="background:${colors[i]}"></span>
+      <span class="legend-label">${labels[i]}</span>
+      <span class="legend-val">$${values[i].toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+    </div>`).join('');
+}
+
+function renderBarChart(entries) {
+  const canvas = document.getElementById('chart-bar');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Monthly totals for the year — exclude cancelled/na
+  const monthlyData = MONTHS_SHORT.map((_, mi) => {
+    const ms = `${_state.year}-${String(mi+1).padStart(2,'0')}`;
+    return entries
+      .filter(e => e.date === ms && e.amount > 0 && e.status !== 'na' && e.status !== 'cancelled')
+      .reduce((s,e) => s+(e.amount||0), 0);
+  });
+
+  // Split personal vs household
+  const personalData = MONTHS_SHORT.map((_, mi) => {
+    const ms = `${_state.year}-${String(mi+1).padStart(2,'0')}`;
+    return entries
+      .filter(e => e.date === ms && e.module === 'personal' && e.amount > 0 && e.status !== 'na' && e.status !== 'cancelled')
+      .reduce((s,e) => s+(e.amount||0), 0);
+  });
+  const householdData = MONTHS_SHORT.map((_, mi) => {
+    const ms = `${_state.year}-${String(mi+1).padStart(2,'0')}`;
+    return entries
+      .filter(e => e.date === ms && e.module === 'household' && e.amount > 0 && e.status !== 'na' && e.status !== 'cancelled')
+      .reduce((s,e) => s+(e.amount||0), 0);
+  });
+
+  if (_charts.bar) { _charts.bar.destroy(); _charts.bar = null; }
+
+  _charts.bar = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: MONTHS_SHORT,
+      datasets: [
+        {
+          label: 'Personal',
+          data: personalData,
+          backgroundColor: 'rgba(107,159,212,0.75)',
+          borderRadius: 4,
+          borderSkipped: false,
+        },
+        {
+          label: 'Household',
+          data: householdData,
+          backgroundColor: 'rgba(143,191,138,0.75)',
+          borderRadius: 4,
+          borderSkipped: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: {
+          stacked: true,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#5a5754', font: { size: 11, family: 'DM Sans' } },
+        },
+        y: {
+          stacked: true,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: {
+            color: '#5a5754',
+            font: { size: 11, family: 'DM Mono' },
+            callback: v => '$'+v.toLocaleString()
+          },
+          border: { dash: [4,4] }
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+          labels: { color: '#9a9690', font: { size: 11, family: 'DM Sans' }, boxWidth: 10, boxHeight: 10, borderRadius: 3, useBorderRadius: true, padding: 16 }
+        },
+        tooltip: {
+          backgroundColor: '#1a1a1a',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          titleColor: '#f0ece4',
+          bodyColor: '#9a9690',
+          padding: 10,
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: $${ctx.raw.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`
+          }
+        }
+      }
+    }
+  });
+}
+
+// ── Entries list ──────────────────────────────────────────────────────────────
+function renderEntries(moduleFilter) {
+  const listId  = 'list-'+_state.view;
+  const list    = document.getElementById(listId);
   if (!list) return;
+
+  const entries  = window.AppDrive.getExpenses();
+  const monthStr = `${_state.year}-${String(_state.month+1).padStart(2,'0')}`;
+  let filtered   = entries.filter(e => e.date === monthStr);
+
+  if (moduleFilter !== 'all') filtered = filtered.filter(e => e.module === moduleFilter);
+  if (_state.filterModule !== 'all' && _state.view === 'entries')
+    filtered = filtered.filter(e => e.module === _state.filterModule);
+
+  // Show all meaningful entries
+  filtered = filtered.filter(e =>
+    e.amount > 0 || e.status === 'paid' || e.status === 'scheduled' ||
+    e.status === 'cancelled' || e.status === 'na' || e.notes
+  );
 
   if (!filtered.length) {
     list.innerHTML = `<div style="padding:2rem;text-align:center;color:var(--color-text-tertiary);font-size:13px;">No entries for ${MONTHS[_state.month]}</div>`;
     return;
   }
 
-  // Group by category
   const grouped = {};
-  filtered.forEach(e => {
-    if (!grouped[e.category]) grouped[e.category] = [];
-    grouped[e.category].push(e);
-  });
+  filtered.forEach(e => { if(!grouped[e.category]) grouped[e.category]=[]; grouped[e.category].push(e); });
 
   let html = '';
   Object.entries(grouped).forEach(([cat, items]) => {
-    const catInfo  = window.CATEGORIES[cat] || { label: cat, icon: 'ti-circle' };
-    const catTotal = items
-      .filter(e => e.status !== 'cancelled' && e.status !== 'na')
-      .reduce((s,e) => s + (e.amount||0), 0);
+    const catInfo  = window.CATEGORIES[cat] || { label:cat, icon:'ti-circle' };
+    const catTotal = items.filter(e => e.status !== 'cancelled' && e.status !== 'na').reduce((s,e) => s+(e.amount||0),0);
+    const dotColor = CAT_COLORS[cat] || '#888';
     html += `<div class="cat-group">
       <div class="cat-group-header">
-        <span><i class="ti ${catInfo.icon}" aria-hidden="true"></i> ${catInfo.label}</span>
+        <span><span class="cat-dot" style="background:${dotColor}"></span>${catInfo.label}</span>
         <span>$${catTotal.toFixed(2)}</span>
       </div>`;
     items.forEach(e => {
@@ -128,20 +295,59 @@ function renderExpenseList() {
       const mod = e.module === 'household'
         ? '<span class="mod-tag mod-household">household</span>'
         : '<span class="mod-tag mod-personal">personal</span>';
-      const amt = e.amount !== null && e.amount > 0 ? '$' + e.amount.toFixed(2) : '—';
+      const amt = e.amount > 0 ? '$'+e.amount.toFixed(2) : '—';
       html += `<div class="expense-row" data-id="${e.id}">
         <div class="expense-name">${e.name} ${mod}</div>
         <div class="expense-right">
           <span class="expense-amt">${amt}</span>
-          <span class="status-pill ${st.class}" onclick="cycleStatus('${e.id}')" title="Tap to cycle status">${st.label}</span>
+          <span class="status-pill ${st.class}" onclick="cycleStatus('${e.id}')" title="Tap to cycle">${st.label}</span>
           <button class="edit-btn" onclick="openEdit('${e.id}')" aria-label="Edit ${e.name}"><i class="ti ti-edit"></i></button>
         </div>
       </div>`;
     });
     html += '</div>';
   });
-
   list.innerHTML = html;
+}
+
+// ── Settings ──────────────────────────────────────────────────────────────────
+function renderSettings() {
+  const el = document.getElementById('view-settings');
+  if (!el) return;
+  const meta    = window.AppDrive.getMeta();
+  const entries = window.AppDrive.getExpenses();
+  const lastSync = meta.last_sync ? new Date(meta.last_sync).toLocaleString() : 'Never';
+  el.innerHTML = `
+    <div class="settings-wrap">
+      <div class="settings-section">
+        <div class="settings-label">App</div>
+        <div class="settings-row"><span>Name</span><span>Mizaniya</span></div>
+        <div class="settings-row"><span>Version</span><span class="settings-val">${APP_VERSION}</span></div>
+        <div class="settings-row"><span>Released</span><span>${APP_DATE}</span></div>
+        <div class="settings-row"><span>Last synced</span><span>${lastSync}</span></div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-label">Data</div>
+        <div class="settings-row"><span>Total entries</span><span>${entries.length}</span></div>
+        <div class="settings-row"><span>Paid entries</span><span>${entries.filter(e=>e.status==='paid').length}</span></div>
+        <div class="settings-row"><span>Years tracked</span><span>${(meta.years||[2026]).join(', ')}</span></div>
+        <div class="settings-row"><span>Storage</span><span>Google Drive</span></div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-label">Version history</div>
+        <div class="settings-row ver-row"><span>v2.0.0</span><span>Sprint 2 — dashboard charts, 5-tab nav</span></div>
+        <div class="settings-row ver-row"><span>v1.3.0</span><span>All entries visible, working nav, settings</span></div>
+        <div class="settings-row ver-row"><span>v1.2.0</span><span>5 statuses, status picker in edit modal</span></div>
+        <div class="settings-row ver-row"><span>v1.1.0</span><span>Security hardening, zero data in code</span></div>
+        <div class="settings-row ver-row"><span>v1.0.0</span><span>Sprint 1 — initial launch</span></div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-label">Account</div>
+        <div class="settings-row"><span>Session</span>
+          <button class="settings-btn-danger" onclick="window.AppAuth.signOut()">Sign out</button>
+        </div>
+      </div>
+    </div>`;
 }
 
 // ── Renewal alerts ────────────────────────────────────────────────────────────
@@ -162,99 +368,26 @@ function renderRenewalAlerts() {
     </div>`).join('');
 }
 
-// ── View switching ────────────────────────────────────────────────────────────
-function renderView() {
-  const sections = ['view-dashboard', 'view-personal', 'view-household', 'view-settings'];
-  sections.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
-
-  // Dashboard and expense list always visible for dashboard/personal/household
-  const expenseWrap = document.getElementById('expense-list-section');
-  const dashCards   = document.getElementById('dashboard-cards');
-  const settingsEl  = document.getElementById('view-settings');
-
-  if (_state.view === 'settings') {
-    if (expenseWrap) expenseWrap.style.display = 'none';
-    if (dashCards)   dashCards.style.display   = 'none';
-    renderSettings();
-    if (settingsEl)  settingsEl.style.display  = 'block';
-  } else {
-    if (expenseWrap) expenseWrap.style.display = 'block';
-    if (dashCards)   dashCards.style.display   = 'grid';
-    if (settingsEl)  settingsEl.style.display  = 'none';
-    renderExpenseList();
-  }
-}
-
-function renderSettings() {
-  const el = document.getElementById('view-settings');
-  if (!el) return;
-  const meta    = window.AppDrive.getMeta();
-  const entries = window.AppDrive.getExpenses();
-  const totalEntries   = entries.length;
-  const paidEntries    = entries.filter(e => e.status === 'paid').length;
-  const lastSync       = meta.last_sync ? new Date(meta.last_sync).toLocaleString() : 'Never';
-
-  el.innerHTML = `
-    <div class="settings-wrap">
-      <div class="settings-section">
-        <div class="settings-label">App</div>
-        <div class="settings-row"><span>Name</span><span>Mizaniya</span></div>
-        <div class="settings-row"><span>Version</span><span class="settings-val">${APP_VERSION}</span></div>
-        <div class="settings-row"><span>Released</span><span>${APP_DATE}</span></div>
-        <div class="settings-row"><span>Last synced</span><span>${lastSync}</span></div>
-      </div>
-      <div class="settings-section">
-        <div class="settings-label">Data</div>
-        <div class="settings-row"><span>Total entries</span><span>${totalEntries}</span></div>
-        <div class="settings-row"><span>Paid entries</span><span>${paidEntries}</span></div>
-        <div class="settings-row"><span>Years tracked</span><span>${(meta.years||[2026]).join(', ')}</span></div>
-        <div class="settings-row"><span>Storage</span><span>Google Drive</span></div>
-      </div>
-      <div class="settings-section">
-        <div class="settings-label">Version history</div>
-        <div class="settings-row ver-row"><span>v1.3.0</span><span>All entries visible, nav, settings</span></div>
-        <div class="settings-row ver-row"><span>v1.2.0</span><span>5 statuses, status picker</span></div>
-        <div class="settings-row ver-row"><span>v1.1.0</span><span>Security hardening, zero data in code</span></div>
-        <div class="settings-row ver-row"><span>v1.0.0</span><span>Sprint 1 — initial launch</span></div>
-      </div>
-      <div class="settings-section">
-        <div class="settings-label">Account</div>
-        <div class="settings-row">
-          <span>Session</span>
-          <button class="settings-btn-danger" onclick="window.AppAuth.signOut()">Sign out</button>
-        </div>
-      </div>
-    </div>`;
-}
-
 // ── Nav ───────────────────────────────────────────────────────────────────────
 function renderNav() {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  const active = document.querySelector(`.nav-btn[data-view="${_state.view}"]`);
-  if (active) active.classList.add('active');
+  const a = document.querySelector(`.nav-btn[data-view="${_state.view}"]`);
+  if (a) a.classList.add('active');
 }
 
 function setView(view) {
-  _state.view = view;
-  // Reset filter when switching views
+  _state.view         = view;
   _state.filterModule = 'all';
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  const allBtn = document.querySelector('.filter-btn[data-mod="all"]');
-  if (allBtn) allBtn.classList.add('active');
   renderAll();
+  renderRenewalAlerts();
 }
 
 // ── Status cycle ──────────────────────────────────────────────────────────────
 async function cycleStatus(id) {
   const entry = window.AppDrive.getExpenses().find(e => e.id === id);
   if (!entry) return;
-  const next = (STATUSES[entry.status] || STATUSES.pending).next;
-  await window.AppDrive.updateEntry(id, { status: next });
-  renderExpenseList();
-  renderSummaryCards();
+  await window.AppDrive.updateEntry(id, { status: (STATUSES[entry.status]||STATUSES.pending).next });
+  renderAll();
 }
 
 // ── Edit modal ────────────────────────────────────────────────────────────────
@@ -264,7 +397,7 @@ function openEdit(id) {
   document.getElementById('edit-id').value     = id;
   document.getElementById('edit-name').value   = entry.name;
   document.getElementById('edit-amount').value = entry.amount ?? '';
-  document.getElementById('edit-notes').value  = entry.notes || '';
+  document.getElementById('edit-notes').value  = entry.notes  || '';
   document.getElementById('edit-status').value = entry.status || 'pending';
   document.getElementById('edit-modal').style.display = 'flex';
 }
@@ -277,35 +410,34 @@ async function saveEdit() {
   await window.AppDrive.updateEntry(id, {
     amount: isNaN(amount) ? null : amount,
     notes:  notes || null,
-    status: status,
+    status,
   });
   closeEdit();
   renderAll();
 }
 
-function closeEdit() {
-  document.getElementById('edit-modal').style.display = 'none';
-}
+function closeEdit() { document.getElementById('edit-modal').style.display = 'none'; }
 
 // ── Other ─────────────────────────────────────────────────────────────────────
 function changeMonth(delta) {
   _state.month = (_state.month + delta + 12) % 12;
   renderAll();
+  renderRenewalAlerts();
 }
 
 function setFilter(module) {
   _state.filterModule = module;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.filter-btn[data-mod="${module}"]`).classList.add('active');
-  renderExpenseList();
+  const btn = document.querySelector(`.filter-btn[data-mod="${module}"]`);
+  if (btn) btn.classList.add('active');
+  renderEntries('all');
 }
 
 async function setRenewal(id, renew) {
   await window.AppDrive.saveRecurring(
-    window.AppDrive.getRecurring().map(r => r.id === id ? { ...r, active: renew } : r)
+    window.AppDrive.getRecurring().map(r => r.id === id ? {...r, active: renew} : r)
   );
   renderRenewalAlerts();
-  renderExpenseList();
 }
 
 window.AppUI = {
