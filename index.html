@@ -86,7 +86,7 @@
     <div id="renewal-alerts" style="display:none;"></div>
 
     <!-- ── Dashboard view ── -->
-    <div id="view-dashboard">
+    <div id="view-dashboard" style="display:none;">
       <div class="chart-section">
         <div class="chart-header">
           <span class="chart-title">Spending by category</span>
@@ -115,19 +115,19 @@
         <button class="filter-btn"        data-mod="personal"  onclick="window.AppUI.setFilter('personal')">Personal</button>
         <button class="filter-btn"        data-mod="household" onclick="window.AppUI.setFilter('household')">Household</button>
       </div>
-      <div class="expense-list-wrap"><div id="list-entries"></div></div>
+      <div class="expense-list-wrap" style="padding-bottom:5rem;"><div id="list-entries"></div></div>
     </div>
 
     <!-- ── Personal view ── -->
     <div id="view-personal" style="display:none;">
       <div class="view-tab-label"><i class="ti ti-user" aria-hidden="true"></i> Personal expenses</div>
-      <div class="expense-list-wrap"><div id="list-personal"></div></div>
+      <div class="expense-list-wrap" style="padding-bottom:5rem;"><div id="list-personal"></div></div>
     </div>
 
     <!-- ── Household view ── -->
     <div id="view-household" style="display:none;">
       <div class="view-tab-label"><i class="ti ti-home" aria-hidden="true"></i> Household expenses</div>
-      <div class="expense-list-wrap"><div id="list-household"></div></div>
+      <div class="expense-list-wrap" style="padding-bottom:5rem;"><div id="list-household"></div></div>
     </div>
 
     <!-- ── Settings view ── -->
