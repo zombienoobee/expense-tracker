@@ -28,7 +28,7 @@ const CAT_COLORS = {
   credit_cards:   '#888fa0',
 };
 
-const APP_VERSION = 'v2.2.0';
+const APP_VERSION = 'v2.3.0';
 const APP_DATE    = '2026-05-10';
 
 let _state = {
@@ -105,8 +105,9 @@ function renderCurrentView() {
 }
 
 // ── Dashboard — charts ────────────────────────────────────────────────────────
-// Fixed cost categories — shown separately, excluded from donut
-const FIXED_CATS = ['housing', 'credit_cards'];
+// Fixed items — only Rent and Service Fee are truly fixed (yearly review)
+// Garbage, Sewerage, Water, PGE are variable monthly — stay in donut
+const FIXED_ITEMS = ['Rent', 'Service Fee', 'Renter Insurance'];
 
 function renderDashboard() {
   const entries = window.AppDrive.getExpenses();
@@ -118,7 +119,7 @@ function renderDashboard() {
 function renderFixedCosts(entries) {
   const monthStr = `${_state.year}-${String(_state.month+1).padStart(2,'0')}`;
   const fixed = entries.filter(e =>
-    e.date === monthStr && FIXED_CATS.includes(e.category) &&
+    e.date === monthStr && FIXED_ITEMS.includes(e.name) &&
     e.amount > 0 && e.status !== 'na' && e.status !== 'cancelled'
   );
 
@@ -162,7 +163,7 @@ function renderDonutChart(entries) {
   const active   = entries.filter(e =>
     e.date === monthStr && e.amount > 0 && 
     e.status !== 'na' && e.status !== 'cancelled' &&
-    !FIXED_CATS.includes(e.category)  // exclude fixed costs
+    !FIXED_ITEMS.includes(e.name)  // exclude fixed items only
   );
 
   // Aggregate by category
@@ -393,6 +394,7 @@ function renderSettings() {
       </div>
       <div class="settings-section">
         <div class="settings-label">Version history</div>
+        <div class="settings-row ver-row"><span>v2.3.0</span><span>Fixed costs = Rent & Service Fee only</span></div>
         <div class="settings-row ver-row"><span>v2.2.0</span><span>Fixed costs card, donut excludes housing</span></div>
         <div class="settings-row ver-row"><span>v2.1.0</span><span>11 categories, corrected frequencies</span></div>
         <div class="settings-row ver-row"><span>v2.0.0</span><span>Sprint 2 — dashboard charts, 5-tab nav</span></div>
