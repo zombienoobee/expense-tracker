@@ -1,8 +1,8 @@
 {
-  "name": "Expense Tracker",
-  "short_name": "Expenses",
-  "description": "Personal yearly expense tracker — private, Google Drive backed",
-  "start_url": "/index.html",
+  "name": "Mizaniya",
+  "short_name": "Mizaniya",
+  "description": "Your private personal ledger",
+  "start_url": "/expense-tracker/",
   "display": "standalone",
   "background_color": "#0f0f0f",
   "theme_color": "#0f0f0f",
