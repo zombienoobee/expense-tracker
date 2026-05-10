@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f0f0f">
+  <title>Expense Tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<!-- ── Sign-in Screen ─────────────────────────────────────────────────────── -->
+<div id="screen-signin">
+  <div class="signin-logo">expense<span>.</span></div>
+  <p class="signin-sub">Your personal expense tracker. Data stored privately in your Google Drive — only you have access.</p>
+  <button class="btn-google" onclick="window.AppAuth.signIn()">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+    Sign in with Google
+  </button>
+  <p class="signin-note">Uses Google Drive's private app folder. No data is ever shared or stored on any server.</p>
+</div>
+
+<!-- ── App Screen ─────────────────────────────────────────────────────────── -->
+<div id="screen-app">
+  <div class="app-inner">
+
+    <!-- Header -->
+    <div class="app-header">
+      <div class="app-logo">expense<span>.</span></div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="window.AppUI.renderAll()" title="Refresh" aria-label="Refresh data">
+          <i class="ti ti-refresh"></i>
+        </button>
+        <button class="icon-btn" onclick="window.AppAuth.signOut()" title="Sign out" aria-label="Sign out">
+          <i class="ti ti-logout"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Month navigation -->
+    <div class="month-nav">
+      <div class="month-title" id="month-label">May 2026</div>
+      <div class="month-arrows">
+        <button class="arrow-btn" onclick="window.AppUI.changeMonth(-1)" aria-label="Previous month">
+          <i class="ti ti-chevron-left"></i>
+        </button>
+        <button class="arrow-btn" onclick="window.AppUI.changeMonth(1)" aria-label="Next month">
+          <i class="ti ti-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="summary-grid">
+      <div class="sum-card">
+        <div class="sum-label">Personal</div>
+        <div class="sum-value" id="card-personal">$0.00</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Household</div>
+        <div class="sum-value" id="card-household">$0.00</div>
+      </div>
+      <div class="sum-card accent">
+        <div class="sum-label">Total this month</div>
+        <div class="sum-value" id="card-total">$0.00</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">YTD total</div>
+        <div class="sum-value" id="card-ytd">$0.00</div>
+      </div>
+    </div>
+
+    <!-- Renewal alerts -->
+    <div id="renewal-alerts" style="display:none;"></div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <button class="filter-btn active" data-mod="all" onclick="window.AppUI.setFilter('all')">All</button>
+      <button class="filter-btn" data-mod="personal" onclick="window.AppUI.setFilter('personal')">Personal</button>
+      <button class="filter-btn" data-mod="household" onclick="window.AppUI.setFilter('household')">Household</button>
+    </div>
+
+    <!-- Expense list -->
+    <div class="expense-list-wrap">
+      <div id="expense-list"></div>
+    </div>
+
+    <!-- Bottom navigation -->
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-btn active" data-view="dashboard" aria-label="Dashboard">
+        <i class="ti ti-layout-dashboard"></i>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-btn" data-view="personal" aria-label="Personal expenses">
+        <i class="ti ti-user"></i>
+        <span>Personal</span>
+      </button>
+      <button class="nav-btn" data-view="household" aria-label="Household expenses">
+        <i class="ti ti-home"></i>
+        <span>Household</span>
+      </button>
+      <button class="nav-btn" data-view="settings" aria-label="Settings">
+        <i class="ti ti-settings"></i>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+  </div>
+</div>
+
+<!-- ── Edit Modal ──────────────────────────────────────────────────────────── -->
+<div id="edit-modal" onclick="if(event.target===this)window.AppUI.closeEdit()">
+  <div class="modal-sheet">
+    <input type="hidden" id="edit-id">
+    <div class="modal-title">Edit expense</div>
+    <div class="field-group">
+      <label class="field-label" for="edit-name">Name</label>
+      <input class="field-input" type="text" id="edit-name" readonly>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="edit-amount">Amount ($)</label>
+      <input class="field-input" type="number" id="edit-amount" step="0.01" min="0" placeholder="0.00">
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="edit-notes">Notes</label>
+      <input class="field-input" type="text" id="edit-notes" placeholder="Optional note…">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="window.AppUI.closeEdit()">Cancel</button>
+      <button class="btn-save" onclick="window.AppUI.saveEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Scripts ─────────────────────────────────────────────────────────────── -->
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/drive.js"></script>
+<script src="js/ui.js"></script>
+
+<!-- Google APIs -->
+<script async defer src="https://apis.google.com/js/api.js" onload="window.AppAuth.gapiLoaded()"></script>
+<script async defer src="https://accounts.google.com/gsi/client" onload="window.AppAuth.gisLoaded()"></script>
+
+<!-- Service Worker registration -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(e => console.warn('SW:', e));
+    });
+  }
+</script>
+
+</body>
+</html>
