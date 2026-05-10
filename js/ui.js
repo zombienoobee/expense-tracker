@@ -28,7 +28,7 @@ const CAT_COLORS = {
   credit_cards:   '#888fa0',
 };
 
-const APP_VERSION = 'v2.1.0';
+const APP_VERSION = 'v2.2.0';
 const APP_DATE    = '2026-05-10';
 
 let _state = {
@@ -105,16 +105,64 @@ function renderCurrentView() {
 }
 
 // ── Dashboard — charts ────────────────────────────────────────────────────────
+// Fixed cost categories — shown separately, excluded from donut
+const FIXED_CATS = ['housing', 'credit_cards'];
+
 function renderDashboard() {
   const entries = window.AppDrive.getExpenses();
+  renderFixedCosts(entries);
   renderDonutChart(entries);
   renderBarChart(entries);
+}
+
+function renderFixedCosts(entries) {
+  const monthStr = `${_state.year}-${String(_state.month+1).padStart(2,'0')}`;
+  const fixed = entries.filter(e =>
+    e.date === monthStr && FIXED_CATS.includes(e.category) &&
+    e.amount > 0 && e.status !== 'na' && e.status !== 'cancelled'
+  );
+
+  const container = document.getElementById('fixed-costs-list');
+  if (!container) return;
+
+  if (!fixed.length) { 
+    container.closest('.fixed-costs-card').style.display = 'none';
+    return; 
+  }
+  container.closest('.fixed-costs-card').style.display = 'block';
+
+  // Group by category
+  const grouped = {};
+  fixed.forEach(e => {
+    if (!grouped[e.category]) grouped[e.category] = { items:[], total:0 };
+    grouped[e.category].items.push(e);
+    grouped[e.category].total += e.amount||0;
+  });
+
+  const monthTotal = fixed.reduce((s,e) => s+(e.amount||0), 0);
+  document.getElementById('fixed-costs-total').textContent = 
+    '$'+monthTotal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  container.innerHTML = Object.entries(grouped).map(([cat, data]) => {
+    const catInfo = window.CATEGORIES[cat] || { label: cat };
+    const items = data.items.map(e => `
+      <div class="fixed-item">
+        <span class="fixed-name">${e.name}</span>
+        <span class="fixed-amt">$${e.amount.toFixed(2)}</span>
+      </div>`).join('');
+    return `<div class="fixed-group">
+      <div class="fixed-group-label">${catInfo.label}</div>
+      ${items}
+    </div>`;
+  }).join('');
 }
 
 function renderDonutChart(entries) {
   const monthStr = `${_state.year}-${String(_state.month+1).padStart(2,'0')}`;
   const active   = entries.filter(e =>
-    e.date === monthStr && e.amount > 0 && e.status !== 'na' && e.status !== 'cancelled'
+    e.date === monthStr && e.amount > 0 && 
+    e.status !== 'na' && e.status !== 'cancelled' &&
+    !FIXED_CATS.includes(e.category)  // exclude fixed costs
   );
 
   // Aggregate by category
@@ -345,6 +393,7 @@ function renderSettings() {
       </div>
       <div class="settings-section">
         <div class="settings-label">Version history</div>
+        <div class="settings-row ver-row"><span>v2.2.0</span><span>Fixed costs card, donut excludes housing</span></div>
         <div class="settings-row ver-row"><span>v2.1.0</span><span>11 categories, corrected frequencies</span></div>
         <div class="settings-row ver-row"><span>v2.0.0</span><span>Sprint 2 — dashboard charts, 5-tab nav</span></div>
         <div class="settings-row ver-row"><span>v1.3.0</span><span>All entries visible, working nav, settings</span></div>
