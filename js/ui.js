@@ -80,17 +80,24 @@ function renderSummaryCards() {
 
 // ── Route to current view ─────────────────────────────────────────────────────
 function renderCurrentView() {
-  const views = ['view-dashboard','view-entries','view-personal','view-household','view-settings'];
-  views.forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
-  const el = document.getElementById('view-'+_state.view);
-  if (el) el.style.display = 'block';
+  // Hide ALL views first
+  ['view-dashboard','view-entries','view-personal','view-household','view-settings']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
 
-  switch(_state.view) {
-    case 'dashboard':  renderDashboard();  break;
+  // Show only the active view
+  const active = document.getElementById('view-' + _state.view);
+  if (active) active.style.display = 'block';
+
+  // Render content for active view
+  switch (_state.view) {
+    case 'dashboard':  renderDashboard();        break;
     case 'entries':    renderEntries('all');      break;
     case 'personal':   renderEntries('personal'); break;
-    case 'household':  renderEntries('household'); break;
-    case 'settings':   renderSettings();  break;
+    case 'household':  renderEntries('household');break;
+    case 'settings':   renderSettings();          break;
   }
 }
 
