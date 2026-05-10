@@ -15,17 +15,20 @@ const STATUSES = {
 };
 
 const CAT_COLORS = {
-  groceries_food: '#c8a96e',
-  subscriptions:  '#6b9fd4',
-  auto_transport: '#8fbf8a',
-  health_copay:   '#d46b6b',
+  streaming:      '#6b9fd4',
+  memberships:    '#c8a96e',
   utilities_tech: '#9b8fd4',
+  insurance:      '#d46b6b',
+  auto_transport: '#8fbf8a',
   charity_giving: '#d4a46b',
+  health_copay:   '#d46b9b',
   housing:        '#6bbfd4',
-  home_personal:  '#d46b9b',
+  groceries:      '#85c17e',
+  shopping:       '#c8956e',
+  credit_cards:   '#888fa0',
 };
 
-const APP_VERSION = 'v2.0.0';
+const APP_VERSION = 'v2.1.0';
 const APP_DATE    = '2026-05-10';
 
 let _state = {
@@ -342,6 +345,7 @@ function renderSettings() {
       </div>
       <div class="settings-section">
         <div class="settings-label">Version history</div>
+        <div class="settings-row ver-row"><span>v2.1.0</span><span>11 categories, corrected frequencies</span></div>
         <div class="settings-row ver-row"><span>v2.0.0</span><span>Sprint 2 — dashboard charts, 5-tab nav</span></div>
         <div class="settings-row ver-row"><span>v1.3.0</span><span>All entries visible, working nav, settings</span></div>
         <div class="settings-row ver-row"><span>v1.2.0</span><span>5 statuses, status picker in edit modal</span></div>
