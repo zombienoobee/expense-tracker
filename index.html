@@ -86,18 +86,6 @@
     <!-- ── Dashboard view ── -->
     <div id="view-dashboard" style="display:none;">
 
-      <!-- Fixed costs card -->
-      <div class="fixed-costs-card" style="display:none;">
-        <div class="chart-header">
-          <div>
-            <span class="chart-title">Fixed costs</span>
-            <span class="fixed-note">↑ May increase 5–10% yearly</span>
-          </div>
-          <span class="fixed-total" id="fixed-costs-total">$0.00</span>
-        </div>
-        <div id="fixed-costs-list"></div>
-      </div>
-
       <div class="chart-section">
         <div class="chart-header">
           <span class="chart-title">Variable spending</span>
@@ -117,6 +105,19 @@
           <canvas id="chart-bar"></canvas>
         </div>
       </div>
+
+      <!-- Fixed costs card — below charts -->
+      <div class="fixed-costs-card" style="display:none;">
+        <div class="chart-header">
+          <div>
+            <span class="chart-title">Fixed costs</span>
+            <span class="fixed-note">↑ May increase 5–10% yearly</span>
+          </div>
+          <span class="fixed-total" id="fixed-costs-total">$0.00</span>
+        </div>
+        <div id="fixed-costs-list"></div>
+      </div>
+
     </div>
 
     <!-- ── Entries view ── -->
