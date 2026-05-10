@@ -1,13 +1,13 @@
 const CACHE = 'expense-tracker-v1.0.0';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/css/app.css',
-  '/js/app.js',
-  '/js/auth.js',
-  '/js/drive.js',
-  '/js/data.js',
-  '/js/ui.js'
+  '/expense-tracker/',
+  '/expense-tracker/index.html',
+  '/expense-tracker/css/app.css',
+  '/expense-tracker/js/app.js',
+  '/expense-tracker/js/auth.js',
+  '/expense-tracker/js/drive.js',
+  '/expense-tracker/js/data.js',
+  '/expense-tracker/js/ui.js'
 ];
 
 self.addEventListener('install', e => {
