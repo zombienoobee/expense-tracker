@@ -63,7 +63,7 @@
     </div>
 
     <!-- Summary cards -->
-    <div class="summary-grid">
+    <div class="summary-grid" id="dashboard-cards">
       <div class="sum-card">
         <div class="sum-label">Personal</div>
         <div class="sum-value" id="card-personal">$0.00</div>
@@ -93,25 +93,28 @@
     </div>
 
     <!-- Expense list -->
-    <div class="expense-list-wrap">
+    <div class="expense-list-wrap" id="expense-list-section">
       <div id="expense-list"></div>
     </div>
 
+    <!-- Settings view -->
+    <div id="view-settings" style="display:none;"></div>
+
     <!-- Bottom navigation -->
     <nav class="bottom-nav" aria-label="Main navigation">
-      <button class="nav-btn active" data-view="dashboard" aria-label="Dashboard">
+      <button class="nav-btn active" data-view="dashboard" aria-label="Dashboard" onclick="window.AppUI.setView('dashboard')">
         <i class="ti ti-layout-dashboard"></i>
         <span>Dashboard</span>
       </button>
-      <button class="nav-btn" data-view="personal" aria-label="Personal expenses">
+      <button class="nav-btn" data-view="personal" aria-label="Personal expenses" onclick="window.AppUI.setView('personal')">
         <i class="ti ti-user"></i>
         <span>Personal</span>
       </button>
-      <button class="nav-btn" data-view="household" aria-label="Household expenses">
+      <button class="nav-btn" data-view="household" aria-label="Household expenses" onclick="window.AppUI.setView('household')">
         <i class="ti ti-home"></i>
         <span>Household</span>
       </button>
-      <button class="nav-btn" data-view="settings" aria-label="Settings">
+      <button class="nav-btn" data-view="settings" aria-label="Settings" onclick="window.AppUI.setView('settings')">
         <i class="ti ti-settings"></i>
         <span>Settings</span>
       </button>
