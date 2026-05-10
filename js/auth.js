@@ -3,7 +3,7 @@
 // Scopes: drive.appdata = private app folder only accessible by this app
 
 const AUTH_CONFIG = {
-  CLIENT_ID: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+  CLIENT_ID: '819202299407-8iajo49ndgo4tb0furlu5qm1c04dkjf1.apps.googleusercontent.com',
   SCOPES: 'https://www.googleapis.com/auth/drive.appdata',
   DISCOVERY_DOC: 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest',
 };
