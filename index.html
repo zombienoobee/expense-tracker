@@ -7,6 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0f0f0f">
   <title>Mizaniya</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,8 +63,8 @@
       </div>
     </div>
 
-    <!-- Summary cards -->
-    <div class="summary-grid" id="dashboard-cards">
+    <!-- Summary cards — always visible -->
+    <div class="summary-grid">
       <div class="sum-card">
         <div class="sum-label">Personal</div>
         <div class="sum-value" id="card-personal">$0.00</div>
@@ -85,36 +86,73 @@
     <!-- Renewal alerts -->
     <div id="renewal-alerts" style="display:none;"></div>
 
-    <!-- Filter bar -->
-    <div class="filter-bar">
-      <button class="filter-btn active" data-mod="all" onclick="window.AppUI.setFilter('all')">All</button>
-      <button class="filter-btn" data-mod="personal" onclick="window.AppUI.setFilter('personal')">Personal</button>
-      <button class="filter-btn" data-mod="household" onclick="window.AppUI.setFilter('household')">Household</button>
+    <!-- ── Dashboard view ── -->
+    <div id="view-dashboard">
+      <div class="chart-section">
+        <div class="chart-header">
+          <span class="chart-title">Spending by category</span>
+          <span class="chart-sub" id="chart-month-label"></span>
+        </div>
+        <div class="donut-wrap">
+          <canvas id="chart-donut"></canvas>
+        </div>
+        <div class="legend-grid" id="donut-legend"></div>
+      </div>
+      <div class="chart-section">
+        <div class="chart-header">
+          <span class="chart-title">Monthly spending — 2026</span>
+          <span class="chart-sub">Personal + Household</span>
+        </div>
+        <div class="bar-wrap">
+          <canvas id="chart-bar"></canvas>
+        </div>
+      </div>
     </div>
 
-    <!-- Expense list -->
-    <div class="expense-list-wrap" id="expense-list-section">
-      <div id="expense-list"></div>
+    <!-- ── Entries view ── -->
+    <div id="view-entries" style="display:none;">
+      <div class="filter-bar">
+        <button class="filter-btn active" data-mod="all"       onclick="window.AppUI.setFilter('all')">All</button>
+        <button class="filter-btn"        data-mod="personal"  onclick="window.AppUI.setFilter('personal')">Personal</button>
+        <button class="filter-btn"        data-mod="household" onclick="window.AppUI.setFilter('household')">Household</button>
+      </div>
+      <div class="expense-list-wrap"><div id="list-entries"></div></div>
     </div>
 
-    <!-- Settings view -->
+    <!-- ── Personal view ── -->
+    <div id="view-personal" style="display:none;">
+      <div class="view-tab-label"><i class="ti ti-user" aria-hidden="true"></i> Personal expenses</div>
+      <div class="expense-list-wrap"><div id="list-personal"></div></div>
+    </div>
+
+    <!-- ── Household view ── -->
+    <div id="view-household" style="display:none;">
+      <div class="view-tab-label"><i class="ti ti-home" aria-hidden="true"></i> Household expenses</div>
+      <div class="expense-list-wrap"><div id="list-household"></div></div>
+    </div>
+
+    <!-- ── Settings view ── -->
     <div id="view-settings" style="display:none;"></div>
 
-    <!-- Bottom navigation -->
+    <!-- Bottom navigation — 5 tabs -->
     <nav class="bottom-nav" aria-label="Main navigation">
-      <button class="nav-btn active" data-view="dashboard" aria-label="Dashboard" onclick="window.AppUI.setView('dashboard')">
+      <button class="nav-btn active" data-view="dashboard" onclick="window.AppUI.setView('dashboard')" aria-label="Dashboard">
         <i class="ti ti-layout-dashboard"></i>
-        <span>Dashboard</span>
+        <span>Home</span>
       </button>
-      <button class="nav-btn" data-view="personal" aria-label="Personal expenses" onclick="window.AppUI.setView('personal')">
+      <button class="nav-btn" data-view="entries" onclick="window.AppUI.setView('entries')" aria-label="All entries">
+        <i class="ti ti-list"></i>
+        <span>Entries</span>
+      </button>
+      <button class="nav-btn" data-view="personal" onclick="window.AppUI.setView('personal')" aria-label="Personal">
         <i class="ti ti-user"></i>
         <span>Personal</span>
       </button>
-      <button class="nav-btn" data-view="household" aria-label="Household expenses" onclick="window.AppUI.setView('household')">
+      <button class="nav-btn" data-view="household" onclick="window.AppUI.setView('household')" aria-label="Household">
         <i class="ti ti-home"></i>
         <span>Household</span>
       </button>
-      <button class="nav-btn" data-view="settings" aria-label="Settings" onclick="window.AppUI.setView('settings')">
+      <button class="nav-btn" data-view="settings" onclick="window.AppUI.setView('settings')" aria-label="Settings">
         <i class="ti ti-settings"></i>
         <span>Settings</span>
       </button>
