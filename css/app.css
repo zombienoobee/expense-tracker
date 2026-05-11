@@ -1,728 +1,509 @@
-/* ── Reset & Base ────────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg:        #0f0f0f;
-  --bg2:       #1a1a1a;
-  --bg3:       #242424;
-  --border:    rgba(255,255,255,0.08);
-  --border2:   rgba(255,255,255,0.14);
-  --text:      #f0ece4;
-  --text2:     #9a9690;
-  --text3:     #5a5754;
-  --accent:    #c8a96e;
-  --accent2:   #8fbf8a;
-  --danger:    #d46b6b;
-  --info:      #6b9fd4;
-  --paid:      #4a7c59;
-  --paid-text: #8fbf8a;
-  --pending:   #7a6030;
-  --pending-text: #c8a96e;
-  --cancelled: #3a3a3a;
-  --cancelled-text: #6a6a6a;
-  --font-body: 'DM Sans', sans-serif;
-  --font-mono: 'DM Mono', monospace;
-  --r:         10px;
-  --r-sm:      6px;
-}
-
-html { font-size: 15px; }
-
-body {
-  font-family: var(--font-body);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ── Sign-in screen ──────────────────────────────────────────────────────── */
-#screen-signin {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  gap: 1.5rem;
-  padding: 2rem;
-}
-
-.signin-logo {
-  font-size: 2rem;
-  font-weight: 600;
-  letter-spacing: -.04em;
-  color: var(--text);
-}
-.signin-logo span { color: var(--accent); }
-
-.signin-sub {
-  font-size: 0.9rem;
-  color: var(--text2);
-  text-align: center;
-  max-width: 280px;
-  line-height: 1.6;
-}
-
-.btn-google {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 24px;
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  border-radius: var(--r);
-  color: var(--text);
-  font-size: 0.9rem;
-  font-family: var(--font-body);
-  cursor: pointer;
-  transition: background .15s, border-color .15s;
-}
-.btn-google:hover { background: var(--bg2); border-color: rgba(255,255,255,.22); }
-.btn-google svg { width: 18px; height: 18px; }
-
-.signin-note {
-  font-size: 0.75rem;
-  color: var(--text3);
-  text-align: center;
-  max-width: 260px;
-  line-height: 1.6;
-}
-
-/* ── App shell ───────────────────────────────────────────────────────────── */
-#screen-app { display: none; }
-
-.app-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.25rem 0;
-}
-
-.app-logo {
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: -.03em;
-  color: var(--text);
-}
-.app-logo span { color: var(--accent); }
-
-.header-actions { display: flex; gap: 8px; align-items: center; }
-
-.icon-btn {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  padding: 6px 8px;
-  color: var(--text2);
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: background .15s;
-}
-.icon-btn:hover { background: var(--bg3); color: var(--text); }
-
-/* ── Month nav ───────────────────────────────────────────────────────────── */
-.month-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem 1.25rem 0;
-}
-
-.month-title {
-  font-size: 1.4rem;
-  font-weight: 600;
-  letter-spacing: -.03em;
-  color: var(--text);
-}
-
-.month-arrows { display: flex; gap: 4px; }
-.arrow-btn {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text2);
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background .15s;
-}
-.arrow-btn:hover { background: var(--bg2); color: var(--text); }
-
-/* ── Summary cards ───────────────────────────────────────────────────────── */
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  padding: 1rem 1.25rem 0;
-}
-
-.sum-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 12px 14px;
-}
-.sum-card.accent { border-color: rgba(200,169,110,.25); }
-
-.sum-label {
-  font-size: 0.7rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  color: var(--text3);
-  margin-bottom: 4px;
-}
-
-.sum-value {
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: -.03em;
-  color: var(--text);
-  font-family: var(--font-mono);
-}
-.sum-card.accent .sum-value { color: var(--accent); }
-
-/* ── Renewal alerts ──────────────────────────────────────────────────────── */
-#renewal-alerts {
-  margin: 1rem 1.25rem 0;
-  background: rgba(200,169,110,.07);
-  border: 1px solid rgba(200,169,110,.2);
-  border-radius: var(--r);
-  padding: 10px 12px;
-}
-
-.alerts-label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--accent);
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.alert-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.8rem;
-  padding: 4px 0;
-  border-top: 1px solid rgba(200,169,110,.1);
-  color: var(--text2);
-}
-.alert-item:first-of-type { border-top: none; }
-.alert-item span:first-child { flex: 1; color: var(--text); }
-.alert-amt { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text2); }
-
-.alert-btn {
-  padding: 3px 10px;
-  border-radius: var(--r-sm);
-  font-size: 0.72rem;
-  font-family: var(--font-body);
-  cursor: pointer;
-  border: 1px solid;
-  font-weight: 500;
-}
-.alert-btn.renew { background: rgba(143,191,138,.1); border-color: rgba(143,191,138,.3); color: var(--accent2); }
-.alert-btn.cancel { background: rgba(212,107,107,.1); border-color: rgba(212,107,107,.3); color: var(--danger); }
-.alert-btn:hover { opacity: .8; }
-
-/* ── Filter bar ──────────────────────────────────────────────────────────── */
-.filter-bar {
-  display: flex;
-  gap: 6px;
-  padding: .875rem 1.25rem 0;
-}
-
-.filter-btn {
-  padding: 5px 14px;
-  border-radius: 99px;
-  border: 1px solid var(--border);
-  background: none;
-  color: var(--text2);
-  font-size: 0.78rem;
-  font-family: var(--font-body);
-  cursor: pointer;
-  transition: all .15s;
-}
-.filter-btn.active,
-.filter-btn:hover { background: var(--bg3); border-color: var(--border2); color: var(--text); }
-.filter-btn.active { border-color: var(--accent); color: var(--accent); }
-
-/* ── Expense list ────────────────────────────────────────────────────────── */
-.expense-list-wrap {
-  padding: .75rem 1.25rem;
-  padding-bottom: 6rem;
-}
-
-.cat-group { margin-bottom: .75rem; }
-
-.cat-group-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.72rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  color: var(--text3);
-  padding: 6px 0 4px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 2px;
-}
-.cat-group-header i { margin-right: 5px; font-size: 0.8rem; }
-
-.expense-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 10px;
-  border-radius: var(--r-sm);
-  transition: background .1s;
-}
-.expense-row:hover { background: var(--bg2); }
-
-.expense-name {
-  font-size: 0.85rem;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-}
-
-.mod-tag {
-  font-size: 0.62rem;
-  font-weight: 500;
-  padding: 1px 5px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-}
-.mod-personal { background: rgba(107,159,212,.12); color: var(--info); }
-.mod-household { background: rgba(143,191,138,.12); color: var(--accent2); }
-
-.expense-right {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.expense-amt {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--text);
-  min-width: 70px;
-  text-align: right;
-}
-
-.status-pill {
-  font-size: 0.65rem;
-  font-weight: 500;
-  padding: 2px 7px;
-  border-radius: 99px;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  border: 1px solid transparent;
-  transition: opacity .15s;
-}
-.status-pill:hover { opacity: .75; }
-.status-paid     { background: var(--paid);      color: var(--paid-text);      border-color: rgba(143,191,138,.2); }
-.status-pending  { background: var(--pending);   color: var(--pending-text);   border-color: rgba(200,169,110,.2); }
-.status-cancelled{ background: var(--cancelled); color: var(--cancelled-text); border-color: rgba(255,255,255,.08); }
-
-.edit-btn {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text3);
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: all .15s;
-}
-.edit-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
-
-/* ── Bottom nav ──────────────────────────────────────────────────────────── */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(15,15,15,.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: space-around;
-  padding: .5rem 0 calc(.5rem + env(safe-area-inset-bottom));
-  max-width: 480px;
-  margin: 0 auto;
-}
-
-.nav-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 6px 16px;
-  background: none;
-  border: none;
-  color: var(--text3);
-  cursor: pointer;
-  font-family: var(--font-body);
-  transition: color .15s;
-}
-.nav-btn i { font-size: 1.2rem; }
-.nav-btn span { font-size: 0.65rem; font-weight: 500; text-transform: uppercase; letter-spacing: .05em; }
-.nav-btn.active { color: var(--accent); }
-.nav-btn:hover { color: var(--text2); }
-
-/* ── Edit modal ──────────────────────────────────────────────────────────── */
-#edit-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.6);
-  backdrop-filter: blur(4px);
-  align-items: flex-end;
-  justify-content: center;
-  z-index: 100;
-}
-
-.modal-sheet {
-  background: var(--bg2);
-  border: 1px solid var(--border2);
-  border-radius: var(--r) var(--r) 0 0;
-  padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom));
-  width: 100%;
-  max-width: 480px;
-}
-
-.modal-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: var(--text);
-}
-
-.field-group { margin-bottom: .875rem; }
-.field-label { font-size: 0.75rem; color: var(--text2); margin-bottom: 4px; display: block; }
-
-.field-input {
-  width: 100%;
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  border-radius: var(--r-sm);
-  padding: 9px 12px;
-  color: var(--text);
-  font-size: 0.9rem;
-  font-family: var(--font-body);
-  outline: none;
-  transition: border-color .15s;
-}
-.field-input:focus { border-color: var(--accent); }
-
-.modal-actions { display: flex; gap: 8px; margin-top: 1.25rem; }
-
-.btn-save {
-  flex: 1;
-  padding: 11px;
-  background: var(--accent);
-  color: #1a1000;
-  border: none;
-  border-radius: var(--r-sm);
-  font-size: 0.9rem;
-  font-weight: 600;
-  font-family: var(--font-body);
-  cursor: pointer;
-  transition: opacity .15s;
-}
-.btn-save:hover { opacity: .85; }
-
-.btn-cancel {
-  padding: 11px 20px;
-  background: var(--bg3);
-  color: var(--text2);
-  border: 1px solid var(--border2);
-  border-radius: var(--r-sm);
-  font-size: 0.9rem;
-  font-family: var(--font-body);
-  cursor: pointer;
-}
-.btn-cancel:hover { color: var(--text); }
-
-/* ── Responsive / max-width container ───────────────────────────────────── */
-.app-inner {
-  max-width: 480px;
-  margin: 0 auto;
-  min-height: 100vh;
-  position: relative;
-}
-
-/* ── Scrollbar ───────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-/* ── Status pill additions — v1.2.0 ─────────────────────────────────────── */
-.status-scheduled { background: rgba(107,159,212,.15); color: #6b9fd4; border-color: rgba(107,159,212,.25); }
-.status-na        { background: rgba(90,87,84,.15);    color: #5a5754; border-color: rgba(90,87,84,.2);     }
-
-/* ── Status select in edit modal ────────────────────────────────────────── */
-.status-select {
-  width: 100%;
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  border-radius: var(--r-sm);
-  padding: 9px 12px;
-  color: var(--text);
-  font-size: 0.9rem;
-  font-family: var(--font-body);
-  outline: none;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239a9690' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  transition: border-color .15s;
-}
-.status-select:focus { border-color: var(--accent); }
-.status-select option { background: #1a1a1a; color: var(--text); }
-
-/* ── Settings view — v1.3.0 ──────────────────────────────────────────────── */
-.settings-wrap { padding: 1rem 1.25rem 6rem; }
-
-.settings-section {
-  margin-bottom: 1.5rem;
-}
-
-.settings-label {
-  font-size: 0.7rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  color: var(--text3);
-  margin-bottom: 4px;
-  padding: 0 2px;
-}
-
-.settings-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  font-size: 0.875rem;
-  color: var(--text);
-}
-.settings-row:first-of-type { border-radius: var(--r) var(--r) 0 0; }
-.settings-row:last-of-type  { border-radius: 0 0 var(--r) var(--r); border-bottom: none; }
-.settings-row span:last-child { color: var(--text2); font-size: 0.82rem; }
-
-.settings-val {
-  font-family: var(--font-mono) !important;
-  color: var(--accent) !important;
-  font-size: 0.82rem;
-}
-
-.ver-row span:first-child {
-  font-family: var(--font-mono);
-  color: var(--accent);
-  font-size: 0.8rem;
-  min-width: 52px;
-}
-.ver-row span:last-child {
-  font-size: 0.78rem !important;
-  color: var(--text3) !important;
-}
-
-.settings-btn-danger {
-  background: rgba(212,107,107,.1);
-  border: 1px solid rgba(212,107,107,.25);
-  color: var(--danger);
-  border-radius: var(--r-sm);
-  padding: 5px 14px;
-  font-size: 0.8rem;
-  font-family: var(--font-body);
-  cursor: pointer;
-}
-.settings-btn-danger:hover { opacity: .8; }
-
-/* ── Sprint 2 — Charts & 5-tab nav ──────────────────────────────────────── */
-
-/* Chart sections */
-.chart-section {
-  margin: 1rem 1.25rem 0;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 1rem;
-}
-
-.chart-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: .875rem;
-}
-
-.chart-title {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--text2);
-}
-
-.chart-sub {
-  font-size: 0.72rem;
-  color: var(--text3);
-}
-
-.donut-wrap {
-  position: relative;
-  height: 200px;
-  margin-bottom: .875rem;
-}
-
-.bar-wrap {
-  position: relative;
-  height: 180px;
-}
-
-/* Donut legend */
-.legend-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: .5rem;
-  border-top: 1px solid var(--border);
-  padding-top: .75rem;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.78rem;
-}
-
-.legend-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.legend-label {
-  flex: 1;
-  color: var(--text2);
-}
-
-.legend-val {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text);
-}
-
-/* View tab label */
-.view-tab-label {
-  font-size: 0.72rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  color: var(--text3);
-  padding: .875rem 1.25rem .25rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* 5-tab nav — tighter */
-.bottom-nav {
-  justify-content: space-around;
-  padding: .375rem 0 calc(.375rem + env(safe-area-inset-bottom));
-}
-
-.nav-btn {
-  padding: 4px 8px;
-  min-width: 0;
-}
-
-.nav-btn span {
-  font-size: 0.6rem;
-}
-
-.nav-btn i {
-  font-size: 1.1rem;
-}
-
-/* Category dot in list header */
-.cat-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  margin-right: 6px;
-  vertical-align: 1px;
-  flex-shrink: 0;
-}
-
-/* ── Fixed costs card — v2.2.0 ───────────────────────────────────────────── */
-.fixed-costs-card {
-  margin: 1rem 1.25rem 0;
-  background: var(--bg2);
-  border: 1px solid rgba(200,169,110,.2);
-  border-radius: var(--r);
-  padding: 1rem;
-}
-
-.fixed-note {
-  font-size: 0.68rem;
-  color: var(--accent);
-  opacity: .75;
-  margin-left: 8px;
-}
-
-.fixed-total {
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--accent);
-}
-
-.fixed-group {
-  margin-top: .5rem;
-  border-top: 1px solid var(--border);
-  padding-top: .5rem;
-}
-
-.fixed-group-label {
-  font-size: 0.68rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  color: var(--text3);
-  margin-bottom: 4px;
-}
-
-.fixed-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 0;
-  font-size: 0.82rem;
-}
-
-.fixed-name { color: var(--text2); }
-.fixed-amt  { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text); }
+// ─── UI Controller — v2.0.0 ───────────────────────────────────────────────────
+// Sprint 2: Dashboard with charts, Entries tab, 5-tab nav
+
+const MONTHS     = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun',
+                      'Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const STATUSES = {
+  paid:      { label: 'Paid',      class: 'status-paid',      next: 'scheduled' },
+  scheduled: { label: 'Scheduled', class: 'status-scheduled', next: 'pending'   },
+  pending:   { label: 'Pending',   class: 'status-pending',   next: 'cancelled' },
+  cancelled: { label: 'Cancelled', class: 'status-cancelled', next: 'na'        },
+  na:        { label: 'N/A',       class: 'status-na',        next: 'paid'      },
+};
+
+const CAT_COLORS = {
+  streaming:      '#6b9fd4',
+  memberships:    '#c8a96e',
+  utilities_tech: '#9b8fd4',
+  insurance:      '#d46b6b',
+  auto_transport: '#8fbf8a',
+  charity_giving: '#d4a46b',
+  health_copay:   '#d46b9b',
+  housing:        '#6bbfd4',
+  groceries:      '#85c17e',
+  shopping:       '#c8956e',
+  credit_cards:   '#888fa0',
+};
+
+const APP_VERSION = 'v2.3.0';
+const APP_DATE    = '2026-05-10';
+
+let _state = {
+  view:         'dashboard',
+  year:         2026,
+  month:        new Date().getMonth(),
+  filterModule: 'all',
+};
+
+let _charts = { donut: null, bar: null };
+
+// ── Show/hide screens ─────────────────────────────────────────────────────────
+function showSignIn() {
+  document.getElementById('screen-signin').style.display = 'flex';
+  document.getElementById('screen-app').style.display   = 'none';
+}
+
+function showApp() {
+  document.getElementById('screen-signin').style.display = 'none';
+  document.getElementById('screen-app').style.display    = 'block';
+  renderAll();
+}
+
+// ── Master render ─────────────────────────────────────────────────────────────
+function renderAll() {
+  renderSummaryCards();
+  renderNav();
+  renderCurrentView();
+}
+
+// ── Summary cards (always visible) ───────────────────────────────────────────
+function renderSummaryCards() {
+  const entries  = window.AppDrive.getExpenses();
+  const monthStr = `${_state.year}-${String(_state.month + 1).padStart(2,'0')}`;
+  const active   = entries.filter(e =>
+    e.date === monthStr && e.amount && e.status !== 'na' && e.status !== 'cancelled'
+  );
+  const personal  = active.filter(e => e.module === 'personal' ).reduce((s,e) => s+(e.amount||0), 0);
+  const household = active.filter(e => e.module === 'household').reduce((s,e) => s+(e.amount||0), 0);
+  const ytd = entries.filter(e => {
+    const [y,m] = e.date.split('-').map(Number);
+    return y === _state.year && m <= (_state.month+1) && e.amount && e.status !== 'na' && e.status !== 'cancelled';
+  }).reduce((s,e) => s+(e.amount||0), 0);
+
+  const fmt = n => '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('card-personal').textContent  = fmt(personal);
+  document.getElementById('card-household').textContent = fmt(household);
+  document.getElementById('card-total').textContent     = fmt(personal+household);
+  document.getElementById('card-ytd').textContent       = fmt(ytd);
+  document.getElementById('month-label').textContent    = MONTHS[_state.month]+' '+_state.year;
+}
+
+// ── Route to current view ─────────────────────────────────────────────────────
+function renderCurrentView() {
+  // Hide ALL views first
+  ['view-dashboard','view-entries','view-personal','view-household','view-settings']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+
+  // Show only the active view
+  const active = document.getElementById('view-' + _state.view);
+  if (active) active.style.display = 'block';
+
+  // Render content for active view
+  switch (_state.view) {
+    case 'dashboard':  renderDashboard();        break;
+    case 'entries':    renderEntries('all');      break;
+    case 'personal':   renderEntries('personal'); break;
+    case 'household':  renderEntries('household');break;
+    case 'settings':   renderSettings();          break;
+  }
+}
+
+// ── Dashboard — charts ────────────────────────────────────────────────────────
+// Fixed items — only Rent and Service Fee are truly fixed (yearly review)
+// Garbage, Sewerage, Water, PGE are variable monthly — stay in donut
+const FIXED_ITEMS = ['Rent', 'Service Fee', 'Renter Insurance'];
+
+function renderDashboard() {
+  const entries = window.AppDrive.getExpenses();
+  renderFixedCosts(entries);
+  renderDonutChart(entries);
+  renderBarChart(entries);
+}
+
+function renderFixedCosts(entries) {
+  const monthStr = `${_state.year}-${String(_state.month+1).padStart(2,'0')}`;
+  const fixed = entries.filter(e =>
+    e.date === monthStr && FIXED_ITEMS.includes(e.name) &&
+    e.amount > 0 && e.status !== 'na' && e.status !== 'cancelled'
+  );
+
+  const container = document.getElementById('fixed-costs-list');
+  if (!container) return;
+
+  if (!fixed.length) { 
+    container.closest('.fixed-costs-card').style.display = 'none';
+    return; 
+  }
+  container.closest('.fixed-costs-card').style.display = 'block';
+
+  // Group by category
+  const grouped = {};
+  fixed.forEach(e => {
+    if (!grouped[e.category]) grouped[e.category] = { items:[], total:0 };
+    grouped[e.category].items.push(e);
+    grouped[e.category].total += e.amount||0;
+  });
+
+  const monthTotal = fixed.reduce((s,e) => s+(e.amount||0), 0);
+  document.getElementById('fixed-costs-total').textContent = 
+    '$'+monthTotal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  container.innerHTML = Object.entries(grouped).map(([cat, data]) => {
+    const catInfo = window.CATEGORIES[cat] || { label: cat };
+    const items = data.items.map(e => `
+      <div class="fixed-item">
+        <span class="fixed-name">${e.name}</span>
+        <span class="fixed-amt">$${e.amount.toFixed(2)}</span>
+      </div>`).join('');
+    return `<div class="fixed-group">
+      <div class="fixed-group-label">${catInfo.label}</div>
+      ${items}
+    </div>`;
+  }).join('');
+}
+
+function renderDonutChart(entries) {
+  const monthStr = `${_state.year}-${String(_state.month+1).padStart(2,'0')}`;
+  const active   = entries.filter(e =>
+    e.date === monthStr && e.amount > 0 && 
+    e.status !== 'na' && e.status !== 'cancelled' &&
+    !FIXED_ITEMS.includes(e.name)  // exclude fixed items only
+  );
+
+  // Aggregate by category
+  const catTotals = {};
+  active.forEach(e => {
+    catTotals[e.category] = (catTotals[e.category]||0) + (e.amount||0);
+  });
+
+  const cats   = Object.keys(catTotals).filter(k => catTotals[k] > 0);
+  const values = cats.map(k => catTotals[k]);
+  const colors = cats.map(k => CAT_COLORS[k] || '#888');
+  const labels = cats.map(k => (window.CATEGORIES[k]||{label:k}).label);
+  const total  = values.reduce((s,v) => s+v, 0);
+
+  const canvas = document.getElementById('chart-donut');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  if (_charts.donut) { _charts.donut.destroy(); _charts.donut = null; }
+
+  _charts.donut = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderColor: '#0f0f0f', borderWidth: 3, hoverOffset: 6 }] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: $${ctx.raw.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})} (${((ctx.raw/total)*100).toFixed(1)}%)`
+          },
+          backgroundColor: '#1a1a1a',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          titleColor: '#f0ece4',
+          bodyColor: '#9a9690',
+          padding: 10,
+        }
+      }
+    }
+  });
+
+  // Render legend
+  const legend = document.getElementById('donut-legend');
+  if (!legend) return;
+  legend.innerHTML = cats.map((k,i) => `
+    <div class="legend-item">
+      <span class="legend-dot" style="background:${colors[i]}"></span>
+      <span class="legend-label">${labels[i]}</span>
+      <span class="legend-val">$${values[i].toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+    </div>`).join('');
+}
+
+function renderBarChart(entries) {
+  const canvas = document.getElementById('chart-bar');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Monthly totals for the year — exclude cancelled/na
+  const monthlyData = MONTHS_SHORT.map((_, mi) => {
+    const ms = `${_state.year}-${String(mi+1).padStart(2,'0')}`;
+    return entries
+      .filter(e => e.date === ms && e.amount > 0 && e.status !== 'na' && e.status !== 'cancelled')
+      .reduce((s,e) => s+(e.amount||0), 0);
+  });
+
+  // Split personal vs household
+  const personalData = MONTHS_SHORT.map((_, mi) => {
+    const ms = `${_state.year}-${String(mi+1).padStart(2,'0')}`;
+    return entries
+      .filter(e => e.date === ms && e.module === 'personal' && e.amount > 0 && e.status !== 'na' && e.status !== 'cancelled')
+      .reduce((s,e) => s+(e.amount||0), 0);
+  });
+  const householdData = MONTHS_SHORT.map((_, mi) => {
+    const ms = `${_state.year}-${String(mi+1).padStart(2,'0')}`;
+    return entries
+      .filter(e => e.date === ms && e.module === 'household' && e.amount > 0 && e.status !== 'na' && e.status !== 'cancelled')
+      .reduce((s,e) => s+(e.amount||0), 0);
+  });
+
+  if (_charts.bar) { _charts.bar.destroy(); _charts.bar = null; }
+
+  _charts.bar = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: MONTHS_SHORT,
+      datasets: [
+        {
+          label: 'Personal',
+          data: personalData,
+          backgroundColor: 'rgba(107,159,212,0.75)',
+          borderRadius: 4,
+          borderSkipped: false,
+        },
+        {
+          label: 'Household',
+          data: householdData,
+          backgroundColor: 'rgba(143,191,138,0.75)',
+          borderRadius: 4,
+          borderSkipped: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: {
+          stacked: true,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#5a5754', font: { size: 11, family: 'DM Sans' } },
+        },
+        y: {
+          stacked: true,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: {
+            color: '#5a5754',
+            font: { size: 11, family: 'DM Mono' },
+            callback: v => '$'+v.toLocaleString()
+          },
+          border: { dash: [4,4] }
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+          labels: { color: '#9a9690', font: { size: 11, family: 'DM Sans' }, boxWidth: 10, boxHeight: 10, borderRadius: 3, useBorderRadius: true, padding: 16 }
+        },
+        tooltip: {
+          backgroundColor: '#1a1a1a',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          titleColor: '#f0ece4',
+          bodyColor: '#9a9690',
+          padding: 10,
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: $${ctx.raw.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`
+          }
+        }
+      }
+    }
+  });
+}
+
+// ── Entries list ──────────────────────────────────────────────────────────────
+function renderEntries(moduleFilter) {
+  const listId  = 'list-'+_state.view;
+  const list    = document.getElementById(listId);
+  if (!list) return;
+
+  const entries  = window.AppDrive.getExpenses();
+  const monthStr = `${_state.year}-${String(_state.month+1).padStart(2,'0')}`;
+  let filtered   = entries.filter(e => e.date === monthStr);
+
+  if (moduleFilter !== 'all') filtered = filtered.filter(e => e.module === moduleFilter);
+  if (_state.filterModule !== 'all' && _state.view === 'entries')
+    filtered = filtered.filter(e => e.module === _state.filterModule);
+
+  // Show all meaningful entries
+  filtered = filtered.filter(e =>
+    e.amount > 0 || e.status === 'paid' || e.status === 'scheduled' ||
+    e.status === 'cancelled' || e.status === 'na' || e.notes
+  );
+
+  if (!filtered.length) {
+    list.innerHTML = `<div style="padding:2rem;text-align:center;color:var(--color-text-tertiary);font-size:13px;">No entries for ${MONTHS[_state.month]}</div>`;
+    return;
+  }
+
+  const grouped = {};
+  filtered.forEach(e => { if(!grouped[e.category]) grouped[e.category]=[]; grouped[e.category].push(e); });
+
+  let html = '';
+  Object.entries(grouped).forEach(([cat, items]) => {
+    const catInfo  = window.CATEGORIES[cat] || { label:cat, icon:'ti-circle' };
+    const catTotal = items.filter(e => e.status !== 'cancelled' && e.status !== 'na').reduce((s,e) => s+(e.amount||0),0);
+    const dotColor = CAT_COLORS[cat] || '#888';
+    html += `<div class="cat-group">
+      <div class="cat-group-header">
+        <span><span class="cat-dot" style="background:${dotColor}"></span>${catInfo.label}</span>
+        <span>$${catTotal.toFixed(2)}</span>
+      </div>`;
+    items.forEach(e => {
+      const st  = STATUSES[e.status] || STATUSES.pending;
+      const mod = e.module === 'household'
+        ? '<span class="mod-tag mod-household">household</span>'
+        : '<span class="mod-tag mod-personal">personal</span>';
+      const amt = e.amount > 0 ? '$'+e.amount.toFixed(2) : '—';
+      html += `<div class="expense-row" data-id="${e.id}">
+        <div class="expense-name">${e.name} ${mod}</div>
+        <div class="expense-right">
+          <span class="expense-amt">${amt}</span>
+          <span class="status-pill ${st.class}" onclick="cycleStatus('${e.id}')" title="Tap to cycle">${st.label}</span>
+          <button class="edit-btn" onclick="openEdit('${e.id}')" aria-label="Edit ${e.name}"><i class="ti ti-edit"></i></button>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  list.innerHTML = html;
+}
+
+// ── Settings ──────────────────────────────────────────────────────────────────
+function renderSettings() {
+  const el = document.getElementById('view-settings');
+  if (!el) return;
+  const meta    = window.AppDrive.getMeta();
+  const entries = window.AppDrive.getExpenses();
+  const lastSync = meta.last_sync ? new Date(meta.last_sync).toLocaleString() : 'Never';
+  el.innerHTML = `
+    <div class="settings-wrap">
+      <div class="settings-section">
+        <div class="settings-label">App</div>
+        <div class="settings-row"><span>Name</span><span>Mizaniya</span></div>
+        <div class="settings-row"><span>Version</span><span class="settings-val">${APP_VERSION}</span></div>
+        <div class="settings-row"><span>Released</span><span>${APP_DATE}</span></div>
+        <div class="settings-row"><span>Last synced</span><span>${lastSync}</span></div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-label">Data</div>
+        <div class="settings-row"><span>Total entries</span><span>${entries.length}</span></div>
+        <div class="settings-row"><span>Paid entries</span><span>${entries.filter(e=>e.status==='paid').length}</span></div>
+        <div class="settings-row"><span>Years tracked</span><span>${(meta.years||[2026]).join(', ')}</span></div>
+        <div class="settings-row"><span>Storage</span><span>Google Drive</span></div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-label">Version history</div>
+        <div class="settings-row ver-row"><span>v2.3.0</span><span>Fixed costs = Rent & Service Fee only</span></div>
+        <div class="settings-row ver-row"><span>v2.2.0</span><span>Fixed costs card, donut excludes housing</span></div>
+        <div class="settings-row ver-row"><span>v2.1.0</span><span>11 categories, corrected frequencies</span></div>
+        <div class="settings-row ver-row"><span>v2.0.0</span><span>Sprint 2 — dashboard charts, 5-tab nav</span></div>
+        <div class="settings-row ver-row"><span>v1.3.0</span><span>All entries visible, working nav, settings</span></div>
+        <div class="settings-row ver-row"><span>v1.2.0</span><span>5 statuses, status picker in edit modal</span></div>
+        <div class="settings-row ver-row"><span>v1.1.0</span><span>Security hardening, zero data in code</span></div>
+        <div class="settings-row ver-row"><span>v1.0.0</span><span>Sprint 1 — initial launch</span></div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-label">Account</div>
+        <div class="settings-row"><span>Session</span>
+          <button class="settings-btn-danger" onclick="window.AppAuth.signOut()">Sign out</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── Renewal alerts ────────────────────────────────────────────────────────────
+function renderRenewalAlerts() {
+  const recurring    = window.AppDrive.getRecurring();
+  const currentMonth = _state.month + 1;
+  const alerts       = recurring.filter(r => r.renewal_month === currentMonth && r.active);
+  const container    = document.getElementById('renewal-alerts');
+  if (!container) return;
+  if (!alerts.length) { container.style.display = 'none'; return; }
+  container.style.display = 'block';
+  container.innerHTML = `<div class="alerts-label"><i class="ti ti-bell" aria-hidden="true"></i> Renewal decisions due this month</div>` +
+    alerts.map(r => `<div class="alert-item">
+      <span>${r.name}</span>
+      <span class="alert-amt">$${r.amount.toFixed(2)}/yr</span>
+      <button class="alert-btn renew"  onclick="setRenewal('${r.id}',true)">Renew</button>
+      <button class="alert-btn cancel" onclick="setRenewal('${r.id}',false)">Cancel</button>
+    </div>`).join('');
+}
+
+// ── Nav ───────────────────────────────────────────────────────────────────────
+function renderNav() {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const a = document.querySelector(`.nav-btn[data-view="${_state.view}"]`);
+  if (a) a.classList.add('active');
+}
+
+function setView(view) {
+  _state.view         = view;
+  _state.filterModule = 'all';
+  renderAll();
+  renderRenewalAlerts();
+}
+
+// ── Status cycle ──────────────────────────────────────────────────────────────
+async function cycleStatus(id) {
+  const entry = window.AppDrive.getExpenses().find(e => e.id === id);
+  if (!entry) return;
+  await window.AppDrive.updateEntry(id, { status: (STATUSES[entry.status]||STATUSES.pending).next });
+  renderAll();
+}
+
+// ── Edit modal ────────────────────────────────────────────────────────────────
+function openEdit(id) {
+  const entry = window.AppDrive.getExpenses().find(e => e.id === id);
+  if (!entry) return;
+  document.getElementById('edit-id').value     = id;
+  document.getElementById('edit-name').value   = entry.name;
+  document.getElementById('edit-amount').value = entry.amount ?? '';
+  document.getElementById('edit-notes').value  = entry.notes  || '';
+  document.getElementById('edit-status').value = entry.status || 'pending';
+  document.getElementById('edit-modal').style.display = 'flex';
+}
+
+async function saveEdit() {
+  const id     = document.getElementById('edit-id').value;
+  const amount = parseFloat(document.getElementById('edit-amount').value);
+  const notes  = document.getElementById('edit-notes').value.trim();
+  const status = document.getElementById('edit-status').value;
+  await window.AppDrive.updateEntry(id, {
+    amount: isNaN(amount) ? null : amount,
+    notes:  notes || null,
+    status,
+  });
+  closeEdit();
+  renderAll();
+}
+
+function closeEdit() { document.getElementById('edit-modal').style.display = 'none'; }
+
+// ── Other ─────────────────────────────────────────────────────────────────────
+function changeMonth(delta) {
+  _state.month = (_state.month + delta + 12) % 12;
+  renderAll();
+  renderRenewalAlerts();
+}
+
+function setFilter(module) {
+  _state.filterModule = module;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`.filter-btn[data-mod="${module}"]`);
+  if (btn) btn.classList.add('active');
+  renderEntries('all');
+}
+
+async function setRenewal(id, renew) {
+  await window.AppDrive.saveRecurring(
+    window.AppDrive.getRecurring().map(r => r.id === id ? {...r, active: renew} : r)
+  );
+  renderRenewalAlerts();
+}
+
+window.AppUI = {
+  showSignIn, showApp, renderAll,
+  setView, cycleStatus, openEdit, saveEdit, closeEdit,
+  changeMonth, setFilter, setRenewal,
+};
